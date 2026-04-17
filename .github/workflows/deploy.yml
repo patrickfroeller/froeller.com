@@ -6,7 +6,7 @@
   uses: pressidium/lftp-mirror-action@v1
   with:
     host: froeller.com
-    user: DEIN_USER
+    user: froeller-ftp
     pass: ${{ secrets.FTP_PASSWORD }}
     localDir: .
     remoteDir: /web
