@@ -16,7 +16,7 @@ jobs:
       - name: Upload via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          server: froeller.com
+          server: ftp.byting.at
           username: froeller-ftp
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /web/
