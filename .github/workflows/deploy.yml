@@ -1,22 +1,13 @@
-name: Deploy Website
+- name: Deploy via FTP (lftp)
+  uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+  continue-on-error: true
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Upload via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: froeller.com
-          username: froeller-ftp
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /web/
+- name: Deploy via lftp fallback
+  uses: pressidium/lftp-mirror-action@v1
+  with:
+    host: froeller.com
+    user: DEIN_USER
+    pass: ${{ secrets.FTP_PASSWORD }}
+    localDir: .
+    remoteDir: /web
+    options: "--verbose --only-newer --parallel=2"
