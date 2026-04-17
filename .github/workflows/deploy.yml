@@ -13,14 +13,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install lftp
-        run: sudo apt-get update && sudo apt-get install -y lftp
-
-      - name: Deploy via lftp
-        run: |
-          lftp -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASSWORD }} froeller.com <<EOF
-          set net:timeout 20
-          set net:max-retries 2
-          mirror -R . /web
-          bye
-          EOF
+      - name: Upload via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: froeller.com
+          username: froeller-ftp
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /web/
