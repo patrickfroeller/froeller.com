@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fröller</title>
+<style>
+  body {
+    margin: 0;
+    background: white;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+    height: 200vh;
+  }
+
+  .logo-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .logo {
+    width: 120px;
+    animation: zoomIn 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    filter: blur(10px) brightness(1.2);
+    opacity: 0;
+  }
+
+  @keyframes zoomIn {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+      filter: blur(20px);
+    }
+    40% {
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2.2);
+      opacity: 1;
+      filter: blur(0px);
+    }
+  }
+
+  .headline {
+    position: fixed;
+    bottom: 25%;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+
+  .sub {
+    font-size: 14px;
+    opacity: 0.5;
+    margin-top: 8px;
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 5%;
+    width: 100%;
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="logo-wrapper">
+  <!-- IMPORTANT: replace with your real path if not visible -->
+  <img src="Logo.png" class="logo" id="logo" alt="Logo">
+</div>
+
+<div class="headline" id="text">
+  European Affairs · Strategy · Sovereignty
+  <div class="sub">Fröller</div>
+</div>
+
+<div class="hint">scroll</div>
+
+<script>
+  // smooth Apple-like reveal on scroll
+  window.addEventListener("scroll", () => {
+    const text = document.getElementById("text");
+    const progress = Math.min(window.scrollY / 300, 1);
+    text.style.opacity = progress;
+  });
+</script>
+
+</body>
+</html>
