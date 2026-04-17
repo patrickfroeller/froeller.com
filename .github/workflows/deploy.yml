@@ -1,13 +1,27 @@
-- name: Deploy via FTP (lftp)
-  uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-  continue-on-error: true
+name: Deploy Website
 
-- name: Deploy via lftp fallback
-  uses: pressidium/lftp-mirror-action@v1
-  with:
-    host: froeller.com
-    user: froeller-ftp
-    pass: ${{ secrets.FTP_PASSWORD }}
-    localDir: .
-    remoteDir: /web
-    options: "--verbose --only-newer --parallel=2"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Deploy via lftp
+        run: |
+          lftp -u ${{ secrets.FTP_USER }},${{ secrets.FTP_PASSWORD }} froeller.com <<EOF
+          set ftp:passive-mode off
+          set net:timeout 20
+          set net:max-retries 2
+          mirror -R . /web
+          bye
+          EOF
