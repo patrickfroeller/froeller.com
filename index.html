@@ -28,7 +28,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
     color: var(--text);
     overflow-x: hidden;
-    min-height: 240vh;
+    min-height: 100vh;
   }
 
   body::before {
@@ -42,7 +42,7 @@
   }
 
   .hero {
-    position: fixed;
+    position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
@@ -112,8 +112,8 @@
   }
 
   .scroll-hint {
-    position: fixed;
-    bottom: 1.4rem;
+    position: absolute;
+    top: calc(100vh - 2.4rem);
     left: 50%;
     transform: translateX(-50%);
     font-size: 0.78rem;
