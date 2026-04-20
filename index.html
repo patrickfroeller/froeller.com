@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>froeller.com</title>
+<meta name="description" content="Private digitale Visitenkarte mit Kontakt und Impressum.">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #0f1012;
+    --muted: #6b7078;
+    --line: #e8eaee;
+    --card: rgba(255, 255, 255, 0.82);
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 240vh;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(0, 0, 0, 0.05), transparent 44%),
+      radial-gradient(circle at 90% 30%, rgba(0, 0, 0, 0.035), transparent 46%);
+    pointer-events: none;
+  }
+
+  .hero {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .logo-wrapper {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+
+  .logo {
+    width: clamp(100px, 15vw, 150px);
+    animation: zoomIn 4.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    filter: blur(10px) brightness(1.08);
+    opacity: 0;
+  }
+
+  @keyframes zoomIn {
+    0% {
+      transform: scale(0.62);
+      opacity: 0;
+      filter: blur(20px);
+    }
+    42% {
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2.14);
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  .headline {
+    margin-top: 2.7rem;
+    font-size: clamp(1.25rem, 2.8vw, 1.8rem);
+    letter-spacing: 0.02em;
+    color: #15181d;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 700ms ease, transform 700ms ease;
+  }
+
+  .sub {
+    margin-top: 0.55rem;
+    font-size: clamp(0.9rem, 1.8vw, 1rem);
+    color: var(--muted);
+  }
+
+  .scroll-hint {
+    position: fixed;
+    bottom: 1.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8e949d;
+    z-index: 3;
+    transition: opacity 280ms ease;
+  }
+
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.08);
+    z-index: 4;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0;
+    background: #171a1f;
+    transform-origin: left;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    margin-top: 108vh;
+    padding: 0 0 4.5rem;
+  }
+
+  .container {
+    width: min(980px, 92vw);
+    margin: 0 auto;
+  }
+
+  .intro {
+    margin-bottom: 1rem;
+    color: #2b313a;
+  }
+
+  .grid {
+    display: grid;
+    gap: 0.95rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    background: var(--card);
+    backdrop-filter: blur(8px);
+    border-radius: 18px;
+    padding: 1rem 1.05rem;
+    box-shadow: var(--shadow);
+  }
+
+  .card h2 {
+    margin: 0 0 0.55rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.01em;
+  }
+
+  .card p {
+    margin: 0.35rem 0;
+    color: #535a63;
+    line-height: 1.55;
+  }
+
+  .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    background: #f6f7f9;
+    border: 1px solid #e7e8ec;
+    padding: 0.1rem 0.32rem;
+    border-radius: 7px;
+    color: #1d2128;
+    font-size: 0.86rem;
+  }
+
+  .footer {
+    margin-top: 1rem;
+    text-align: center;
+    color: #7b818b;
+    font-size: 0.84rem;
+  }
+
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .headline {
+      margin-top: 2.2rem;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="logo-wrapper" id="logoWrapper">
+    <img src="logo.png" class="logo" id="logo" alt="froeller.com Logo">
+    <div class="headline" id="hero-title">
+      Private digitale Visitenkarte
+      <div class="sub">Technisch präzise · reduziert · professionell</div>
+    </div>
+  </div>
+</section>
+
+<div class="scroll-hint" id="scrollHint">Scroll</div>
+
+<main class="content" id="content">
+  <div class="container">
+    <p class="intro">
+      Der bestehende, minimalistische froeller.com Look bleibt erhalten (weiß, clean, zentriertes Logo) und wird um echte Inhalte ergänzt.
+    </p>
+
+    <section class="grid" aria-label="Kontakt und Impressum">
+      <article class="card" id="kontakt">
+        <h2>Kontakt</h2>
+        <p>E-Mail: <a href="mailto:[IHRE-KONTAKT-EMAIL]" class="mono">[IHRE-KONTAKT-EMAIL]</a></p>
+        <p>LinkedIn: <span class="mono">[OPTIONAL-LINKEDIN-URL]</span></p>
+        <p>Telefon: <span class="mono">[OPTIONAL-TELEFON]</span></p>
+      </article>
+
+      <article class="card" id="impressum">
+        <h2>Impressum</h2>
+        <p>Angaben gemäß § 5 TMG</p>
+        <p><span class="mono">[VORNAME NACHNAME]</span><br>
+          <span class="mono">[STRASSE HAUSNUMMER]</span><br>
+          <span class="mono">[PLZ ORT]</span><br>
+          Deutschland</p>
+      </article>
+    </section>
+
+    <p class="footer">© <span id="year"></span> froeller.com · Alle Rechte vorbehalten.</p>
+  </div>
+</main>
+
+<script>
+  const headline = document.getElementById('hero-title');
+  const logoWrapper = document.getElementById('logoWrapper');
+  const progressBar = document.getElementById('progressBar');
+  const scrollHint = document.getElementById('scrollHint');
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function onScroll() {
+    const scrollY = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = max > 0 ? scrollY / max : 0;
+
+    const reveal = Math.min(scrollY / 260, 1);
+    headline.style.opacity = reveal;
+    headline.style.transform = `translateY(${(1 - reveal) * 8}px)`;
+
+    const heroShift = Math.min(scrollY * 0.05, 18);
+    logoWrapper.style.transform = `translate3d(0, ${heroShift}px, 0)`;
+
+    progressBar.style.width = `${progress * 100}%`;
+    scrollHint.style.opacity = scrollY > 120 ? '0' : '1';
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>
