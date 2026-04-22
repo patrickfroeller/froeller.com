@@ -40,8 +40,11 @@
       height: var(--logo-size);
       display: grid;
       place-items: center;
-      cursor: grab;
       transform: translateZ(0);
+    }
+
+    .logo-stage.is-hover-target {
+      cursor: grab;
     }
 
     .logo-stage.is-dragging {
@@ -54,11 +57,24 @@
       display: block;
       pointer-events: none;
       will-change: transform;
+      opacity: 0;
+      animation: logoFadeIn 1100ms cubic-bezier(0.22, 1, 0.36, 1) 120ms forwards;
+    }
+
+    @keyframes logoFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .logo {
         transition: transform 0.01ms linear;
+        animation: none;
+        opacity: 1;
       }
     }
   </style>
@@ -79,7 +95,8 @@
         isDragging: false,
         lastPointerAngle: 0,
         lastPointerTime: 0,
-        animationId: 0
+        animationId: 0,
+        returnAnimationId: 0
       };
 
       const physics = {
@@ -88,6 +105,14 @@
         maxVelocity: 8,
         dragSmoothing: 0.35
       };
+
+      function isInsideLogoCircle(event) {
+        const center = getCenter();
+        const radius = stage.clientWidth / 2;
+        const dx = event.clientX - center.x;
+        const dy = event.clientY - center.y;
+        return Math.hypot(dx, dy) <= radius;
+      }
 
       function getCenter() {
         const rect = stage.getBoundingClientRect();
@@ -118,8 +143,59 @@
         logo.style.transform = `rotate(${state.rotation}deg)`;
       }
 
+      function normalizeTo180(angle) {
+        let normalized = angle % 360;
+        if (normalized > 180) {
+          normalized -= 360;
+        }
+        if (normalized < -180) {
+          normalized += 360;
+        }
+        return normalized;
+      }
+
+      function animateBackToBase() {
+        cancelAnimationFrame(state.returnAnimationId);
+
+        const reducedMotionEnabled = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotionEnabled) {
+          state.rotation = 0;
+          render();
+          return;
+        }
+
+        const startRotation = state.rotation;
+        const offsetToBase = normalizeTo180(startRotation);
+        const targetRotation = startRotation - offsetToBase;
+        const durationMs = 520;
+        const startTime = performance.now();
+
+        const step = (now) => {
+          if (state.isDragging) {
+            return;
+          }
+
+          const t = Math.min((now - startTime) / durationMs, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+
+          state.rotation = startRotation + (targetRotation - startRotation) * eased;
+          render();
+
+          if (t < 1) {
+            state.returnAnimationId = requestAnimationFrame(step);
+            return;
+          }
+
+          state.rotation = 0;
+          render();
+        };
+
+        state.returnAnimationId = requestAnimationFrame(step);
+      }
+
       function beginInertia() {
         cancelAnimationFrame(state.animationId);
+        cancelAnimationFrame(state.returnAnimationId);
 
         const step = () => {
           if (state.isDragging) {
@@ -132,6 +208,7 @@
           if (Math.abs(state.velocity) < physics.stopThreshold) {
             state.velocity = 0;
             render();
+            animateBackToBase();
             return;
           }
 
@@ -143,16 +220,25 @@
       }
 
       function onPointerDown(event) {
+        if (!isInsideLogoCircle(event)) {
+          return;
+        }
+
         event.preventDefault();
         stage.classList.add('is-dragging');
         state.isDragging = true;
         state.lastPointerAngle = getPointerAngle(event);
         state.lastPointerTime = performance.now();
         cancelAnimationFrame(state.animationId);
+        cancelAnimationFrame(state.returnAnimationId);
         stage.setPointerCapture(event.pointerId);
       }
 
       function onPointerMove(event) {
+        if (!state.isDragging) {
+          stage.classList.toggle('is-hover-target', isInsideLogoCircle(event));
+        }
+
         if (!state.isDragging) {
           return;
         }
@@ -182,6 +268,7 @@
 
         state.isDragging = false;
         stage.classList.remove('is-dragging');
+        stage.classList.toggle('is-hover-target', isInsideLogoCircle(event));
         stage.releasePointerCapture(event.pointerId);
         beginInertia();
       }
@@ -190,6 +277,11 @@
       stage.addEventListener('pointermove', onPointerMove);
       stage.addEventListener('pointerup', onPointerUp);
       stage.addEventListener('pointercancel', onPointerUp);
+      stage.addEventListener('pointerleave', () => {
+        if (!state.isDragging) {
+          stage.classList.remove('is-hover-target');
+        }
+      });
 
       render();
     })();
