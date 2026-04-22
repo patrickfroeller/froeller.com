@@ -13,6 +13,7 @@
       --page-text: #111111;
       --logo-color: #ffffff;
       --logo-size: clamp(180px, 25vmin, 320px);
+      --footer-font: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     * {
@@ -29,6 +30,7 @@
     }
 
     body {
+      position: relative;
       display: grid;
       place-items: center;
       overscroll-behavior: none;
@@ -73,6 +75,25 @@
       mask-size: contain;
     }
 
+
+    .site-footer {
+      position: fixed;
+      left: 50%;
+      bottom: clamp(12px, 2.2vmin, 24px);
+      transform: translateX(-50%);
+      margin: 0;
+      color: var(--logo-color);
+      font-family: var(--footer-font);
+      font-size: clamp(0.82rem, 1.4vmin, 1rem);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      opacity: 0.92;
+      text-align: center;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
     @keyframes logoFadeIn {
       from {
         opacity: 0;
@@ -95,6 +116,7 @@
   <main class="logo-stage" id="logoStage" aria-label="Interaktives Logo">
     <div class="logo" id="logo" role="img" aria-label="froeller.com Logo"></div>
   </main>
+  <p class="site-footer">© <span id="copyrightYear"></span> Patrick Fröller. All rights reserved.</p>
 
   <script>
     (() => {
@@ -265,6 +287,11 @@
       }
 
       applyAccessibleRandomBackground();
+
+      const yearNode = document.getElementById('copyrightYear');
+      if (yearNode) {
+        yearNode.textContent = String(new Date().getFullYear());
+      }
 
       const stage = document.getElementById('logoStage');
       const logo = document.getElementById('logo');
