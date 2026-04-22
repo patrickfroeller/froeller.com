@@ -124,16 +124,67 @@
         };
       }
 
-      function hexToRgb(hex) {
-        const clean = hex.replace('#', '');
-        const normalized = clean.length === 3
-          ? clean.split('').map((part) => part + part).join('')
-          : clean;
+      function rgbToHsl({ r, g, b }) {
+        const red = r / 255;
+        const green = g / 255;
+        const blue = b / 255;
+        const max = Math.max(red, green, blue);
+        const min = Math.min(red, green, blue);
+        const delta = max - min;
+
+        let hue = 0;
+        if (delta !== 0) {
+          if (max === red) {
+            hue = ((green - blue) / delta) % 6;
+          } else if (max === green) {
+            hue = (blue - red) / delta + 2;
+          } else {
+            hue = (red - green) / delta + 4;
+          }
+        }
+
+        const lightness = (max + min) / 2;
+        const saturation = delta === 0
+          ? 0
+          : delta / (1 - Math.abs(2 * lightness - 1));
 
         return {
-          r: parseInt(normalized.slice(0, 2), 16),
-          g: parseInt(normalized.slice(2, 4), 16),
-          b: parseInt(normalized.slice(4, 6), 16)
+          h: ((hue * 60) + 360) % 360,
+          s: saturation * 100,
+          l: lightness * 100
+        };
+      }
+
+      function hslToRgb({ h, s, l }) {
+        const saturation = s / 100;
+        const lightness = l / 100;
+        const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+        const hueSection = h / 60;
+        const x = chroma * (1 - Math.abs((hueSection % 2) - 1));
+
+        let red = 0;
+        let green = 0;
+        let blue = 0;
+
+        if (hueSection >= 0 && hueSection < 1) {
+          red = chroma; green = x; blue = 0;
+        } else if (hueSection >= 1 && hueSection < 2) {
+          red = x; green = chroma; blue = 0;
+        } else if (hueSection >= 2 && hueSection < 3) {
+          red = 0; green = chroma; blue = x;
+        } else if (hueSection >= 3 && hueSection < 4) {
+          red = 0; green = x; blue = chroma;
+        } else if (hueSection >= 4 && hueSection < 5) {
+          red = x; green = 0; blue = chroma;
+        } else {
+          red = chroma; green = 0; blue = x;
+        }
+
+        const match = lightness - chroma / 2;
+        return {
+          r: Math.round((red + match) * 255),
+          g: Math.round((green + match) * 255),
+          b: Math.round((blue + match) * 255)
         };
       }
 
@@ -144,22 +195,39 @@
       }
 
       function pickLogoColorForBackground(background) {
-        const curatedPalette = [
-          '#111827', '#0f766e', '#14532d', '#1d4ed8', '#4338ca',
-          '#7c2d12', '#9f1239', '#7e22ce', '#b91c1c', '#0f172a',
-          '#f8fafc', '#fef3c7', '#dbeafe', '#dcfce7', '#fce7f3'
-        ];
+        const backgroundHsl = rgbToHsl(background);
+        const isBgLight = getRelativeLuminance(background) > 0.45;
+        const hueOffsets = [150, 180, 210, 120, 240];
+        const saturationOptions = [72, 78, 84, 90, 96];
+        const lightnessOptions = isBgLight
+          ? [24, 30, 36, 42, 48]
+          : [58, 64, 70, 76, 82];
 
-        const candidates = curatedPalette
-          .map((hex) => ({ hex, contrast: getContrastFromRgb(background, hexToRgb(hex)) }))
-          .sort((a, b) => b.contrast - a.contrast);
-
-        const strongCandidate = candidates.find((entry) => entry.contrast >= 3.5);
-        if (strongCandidate) {
-          return strongCandidate.hex;
+        const candidates = [];
+        for (const offset of hueOffsets) {
+          for (const saturation of saturationOptions) {
+            for (const lightness of lightnessOptions) {
+              const hue = (backgroundHsl.h + offset + Math.random() * 18 - 9 + 360) % 360;
+              const candidateHsl = { h: hue, s: saturation, l: lightness };
+              const candidateRgb = hslToRgb(candidateHsl);
+              candidates.push({
+                css: `hsl(${Math.round(candidateHsl.h)} ${candidateHsl.s}% ${candidateHsl.l}%)`,
+                contrast: getContrastFromRgb(background, candidateRgb)
+              });
+            }
+          }
         }
 
-        return candidates[0]?.hex ?? '#ffffff';
+        candidates.sort((a, b) => b.contrast - a.contrast);
+
+        const vividMatch = candidates.find((entry) => entry.contrast >= 3);
+        if (vividMatch) {
+          return vividMatch.css;
+        }
+
+        return getContrastFromRgb(background, { r: 255, g: 255, b: 255 }) >= 4.5
+          ? '#ffffff'
+          : '#000000';
       }
 
       function applyAccessibleRandomBackground() {
