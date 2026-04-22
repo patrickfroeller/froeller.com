@@ -22,6 +22,7 @@
 
   .logo-rotator {
     touch-action: none;
+    -webkit-touch-callout: none;
     cursor: grab;
     user-select: none;
   }
@@ -112,12 +113,19 @@
   let dragOffset = 0;
   let currentRotation = 0;
 
+  const getPoint = (event) => {
+    if (event.touches && event.touches[0]) return event.touches[0];
+    if (event.changedTouches && event.changedTouches[0]) return event.changedTouches[0];
+    return event;
+  };
+
   const getAngleToCenter = (event) => {
+    const point = getPoint(event);
     const rect = rotator.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const dx = event.clientX - cx;
-    const dy = event.clientY - cy;
+    const dx = point.clientX - cx;
+    const dy = point.clientY - cy;
     return {
       angle: Math.atan2(dy, dx) * (180 / Math.PI),
       distance: Math.hypot(dx, dy),
@@ -130,7 +138,7 @@
     rotator.style.transform = `rotate(${currentRotation}deg)`;
   };
 
-  rotator.addEventListener("pointerdown", (event) => {
+  const startDragging = (event) => {
     const { angle, distance, radius } = getAngleToCenter(event);
     const edgeThreshold = radius * 0.62;
 
@@ -139,28 +147,38 @@
     isDragging = true;
     dragOffset = angle - currentRotation;
     rotator.classList.add("is-dragging");
-    rotator.setPointerCapture(event.pointerId);
-    event.preventDefault();
-  });
 
-  rotator.addEventListener("pointermove", (event) => {
+    if (event.pointerId !== undefined && rotator.setPointerCapture) {
+      rotator.setPointerCapture(event.pointerId);
+    }
+    event.preventDefault();
+  };
+
+  const drag = (event) => {
     if (!isDragging) return;
     const { angle } = getAngleToCenter(event);
     applyRotation(angle - dragOffset);
     event.preventDefault();
-  });
+  };
 
   const stopDragging = (event) => {
     if (!isDragging) return;
     isDragging = false;
     rotator.classList.remove("is-dragging");
-    if (event.pointerId !== undefined && rotator.hasPointerCapture(event.pointerId)) {
+    if (event.pointerId !== undefined && rotator.hasPointerCapture && rotator.hasPointerCapture(event.pointerId)) {
       rotator.releasePointerCapture(event.pointerId);
     }
   };
 
+  rotator.addEventListener("pointerdown", startDragging);
+  rotator.addEventListener("pointermove", drag);
   rotator.addEventListener("pointerup", stopDragging);
   rotator.addEventListener("pointercancel", stopDragging);
+
+  rotator.addEventListener("touchstart", startDragging, { passive: false });
+  rotator.addEventListener("touchmove", drag, { passive: false });
+  rotator.addEventListener("touchend", stopDragging);
+  rotator.addEventListener("touchcancel", stopDragging);
 </script>
 
 </body>
