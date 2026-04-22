@@ -1,348 +1,198 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>froeller.com</title>
-<meta name="description" content="Private digitale Visitenkarte mit Kontakt und Impressum.">
-<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<meta name="referrer" content="no-referrer">
-<style>
-  :root {
-    --bg: #ffffff;
-    --text: #0f1012;
-    --muted: #6b7078;
-    --line: #e8eaee;
-    --card: rgba(255, 255, 255, 0.82);
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  html,
-  body {
-    margin: 0;
-    background: var(--bg);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
-    color: var(--text);
-    overflow-x: hidden;
-    min-height: 100vh;
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(circle at 18% 12%, rgba(0, 0, 0, 0.05), transparent 44%),
-      radial-gradient(circle at 90% 30%, rgba(0, 0, 0, 0.035), transparent 46%);
-    pointer-events: none;
-  }
-
-  .hero {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    text-align: center;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .logo-wrapper {
-    transform: translateZ(0);
-    will-change: transform, opacity;
-    animation: introPop 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .logo {
-    width: clamp(100px, 15vw, 150px);
-    animation: logoFocus 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    filter: blur(12px) brightness(1.08);
-    opacity: 0;
-    will-change: transform, opacity, filter;
-  }
-
-  @keyframes introPop {
-    0% {
-      transform: scale(1.3);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  @keyframes logoFocus {
-    0% {
-      transform: scale(0.64);
-      opacity: 0;
-      filter: blur(20px);
-    }
-    40% {
-      opacity: 0.58;
-    }
-    100% {
-      transform: scale(2.2);
-      opacity: 0.36;
-      filter: blur(0);
-    }
-  }
-
-  .headline {
-    margin-top: 2.7rem;
-    font-size: clamp(1.25rem, 2.8vw, 1.8rem);
-    letter-spacing: 0.02em;
-    color: #15181d;
-    opacity: 0;
-    transform: translateY(14px) scale(0.97);
-    transition: opacity 580ms ease, transform 580ms ease;
-  }
-
-  .sub {
-    margin-top: 0.55rem;
-    font-size: clamp(0.9rem, 1.8vw, 1rem);
-    color: var(--muted);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 620ms ease, transform 620ms ease;
-  }
-
-  .scroll-hint {
-    position: absolute;
-    top: calc(100vh - 2.4rem);
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.78rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #737b85;
-    z-index: 3;
-    transition: opacity 280ms ease;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    animation: scrollBlink 1.2s ease-in-out infinite;
-  }
-
-  .scroll-icon {
-    width: 14px;
-    height: 22px;
-    border: 1.6px solid currentColor;
-    border-radius: 12px;
-    position: relative;
-  }
-
-  .scroll-icon::before {
-    content: "";
-    position: absolute;
-    top: 3px;
-    left: 50%;
-    width: 3px;
-    height: 5px;
-    border-radius: 3px;
-    background: currentColor;
-    transform: translateX(-50%);
-    animation: wheel 1.15s ease-in-out infinite;
-  }
-
-  @keyframes scrollBlink {
-    0%,
-    100% {
-      opacity: 0.4;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes wheel {
-    0%,
-    100% {
-      opacity: 0.95;
-      transform: translate(-50%, 0);
-    }
-    50% {
-      opacity: 0.25;
-      transform: translate(-50%, 6px);
-    }
-  }
-
-  .progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: rgba(0, 0, 0, 0.08);
-    z-index: 4;
-  }
-
-  .progress-bar {
-    height: 100%;
-    width: 0;
-    background: #171a1f;
-    transform-origin: left;
-  }
-
-  .content {
-    position: relative;
-    z-index: 1;
-    margin-top: 108vh;
-    padding: 0 0 4.5rem;
-  }
-
-  .container {
-    width: min(980px, 92vw);
-    margin: 0 auto;
-  }
-
-  .intro {
-    margin-bottom: 1rem;
-    color: #2b313a;
-  }
-
-  .grid {
-    display: grid;
-    gap: 0.95rem;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .card {
-    border: 1px solid var(--line);
-    background: var(--card);
-    backdrop-filter: blur(8px);
-    border-radius: 18px;
-    padding: 1rem 1.05rem;
-    box-shadow: var(--shadow);
-  }
-
-  .card h2 {
-    margin: 0 0 0.55rem;
-    font-size: 1.05rem;
-    letter-spacing: 0.01em;
-  }
-
-  .card p {
-    margin: 0.35rem 0;
-    color: #535a63;
-    line-height: 1.55;
-  }
-
-  .mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    background: #f6f7f9;
-    border: 1px solid #e7e8ec;
-    padding: 0.1rem 0.32rem;
-    border-radius: 7px;
-    color: #1d2128;
-    font-size: 0.86rem;
-  }
-
-  .footer {
-    margin-top: 1rem;
-    text-align: center;
-    color: #7b818b;
-    font-size: 0.84rem;
-  }
-
-  @media (max-width: 860px) {
-    .grid {
-      grid-template-columns: 1fr;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>froeller.com</title>
+  <meta name="description" content="Minimale Startseite mit zentriertem, interaktiv drehbarem Logo.">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="referrer" content="no-referrer">
+  <style>
+    :root {
+      --page-bg: #efefef;
+      --logo-size: clamp(180px, 25vmin, 320px);
     }
 
-    .headline {
-      margin-top: 2.2rem;
+    * {
+      box-sizing: border-box;
     }
-  }
-</style>
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--page-bg);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .logo-stage {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      display: grid;
+      place-items: center;
+      cursor: grab;
+      transform: translateZ(0);
+    }
+
+    .logo-stage.is-dragging {
+      cursor: grabbing;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo {
+        transition: transform 0.01ms linear;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+  <main class="logo-stage" id="logoStage" aria-label="Interaktives Logo">
+    <img src="logo.png" alt="froeller.com Logo" class="logo" id="logo">
+  </main>
 
-<section class="hero" aria-labelledby="hero-title">
-  <div class="logo-wrapper" id="logoWrapper">
-    <img src="logo.png" class="logo" id="logo" alt="froeller.com Logo">
-    <div class="headline" id="hero-title">
-      Private digitale Visitenkarte
-      <div class="sub" id="hero-sub">Technisch präzise · reduziert · professionell</div>
-    </div>
-  </div>
-</section>
+  <script>
+    (() => {
+      const stage = document.getElementById('logoStage');
+      const logo = document.getElementById('logo');
 
-<div class="scroll-hint" id="scrollHint"><span class="scroll-icon" aria-hidden="true"></span>Scroll</div>
+      const state = {
+        rotation: 0,
+        velocity: 0,
+        isDragging: false,
+        lastPointerAngle: 0,
+        lastPointerTime: 0,
+        animationId: 0
+      };
 
-<main class="content" id="content">
-  <div class="container">
-    <p class="intro">
-      Der bestehende, minimalistische froeller.com Look bleibt erhalten (weiß, clean, zentriertes Logo) und wird um echte Inhalte ergänzt.
-    </p>
+      const physics = {
+        damping: 0.95,
+        stopThreshold: 0.01,
+        maxVelocity: 8,
+        dragSmoothing: 0.35
+      };
 
-    <section class="grid" aria-label="Kontakt und Impressum">
-      <article class="card" id="kontakt">
-        <h2>Kontakt</h2>
-        <p>E-Mail: <a href="mailto:[IHRE-KONTAKT-EMAIL]" class="mono">[IHRE-KONTAKT-EMAIL]</a></p>
-        <p>LinkedIn: <span class="mono">[OPTIONAL-LINKEDIN-URL]</span></p>
-        <p>Telefon: <span class="mono">[OPTIONAL-TELEFON]</span></p>
-      </article>
+      function getCenter() {
+        const rect = stage.getBoundingClientRect();
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
+      }
 
-      <article class="card" id="impressum">
-        <h2>Impressum</h2>
-        <p>Angaben gemäß § 5 TMG</p>
-        <p><span class="mono">[VORNAME NACHNAME]</span><br>
-          <span class="mono">[STRASSE HAUSNUMMER]</span><br>
-          <span class="mono">[PLZ ORT]</span><br>
-          Deutschland</p>
-      </article>
-    </section>
+      function getPointerAngle(event) {
+        const center = getCenter();
+        const dx = event.clientX - center.x;
+        const dy = event.clientY - center.y;
+        return Math.atan2(dy, dx);
+      }
 
-    <p class="footer">© <span id="year"></span> froeller.com · Alle Rechte vorbehalten.</p>
-  </div>
-</main>
+      function normalizeDeltaAngle(delta) {
+        if (delta > Math.PI) {
+          return delta - Math.PI * 2;
+        }
+        if (delta < -Math.PI) {
+          return delta + Math.PI * 2;
+        }
+        return delta;
+      }
 
-<script>
-  const headline = document.getElementById('hero-title');
-  const subline = document.getElementById('hero-sub');
-  const logo = document.getElementById('logo');
-  const logoWrapper = document.getElementById('logoWrapper');
-  const progressBar = document.getElementById('progressBar');
-  const scrollHint = document.getElementById('scrollHint');
+      function render() {
+        logo.style.transform = `rotate(${state.rotation}deg)`;
+      }
 
-  document.getElementById('year').textContent = new Date().getFullYear();
+      function beginInertia() {
+        cancelAnimationFrame(state.animationId);
 
-  function onScroll() {
-    const scrollY = window.scrollY;
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = max > 0 ? scrollY / max : 0;
+        const step = () => {
+          if (state.isDragging) {
+            return;
+          }
 
-    const revealStart = 28;
-    const revealEnd = 330;
-    const reveal = Math.min(Math.max((scrollY - revealStart) / (revealEnd - revealStart), 0), 1);
+          state.rotation += state.velocity;
+          state.velocity *= physics.damping;
 
-    headline.style.opacity = reveal;
-    headline.style.transform = `translateY(${(1 - reveal) * 14}px) scale(${0.97 + reveal * 0.03})`;
+          if (Math.abs(state.velocity) < physics.stopThreshold) {
+            state.velocity = 0;
+            render();
+            return;
+          }
 
-    const subReveal = Math.min(Math.max((scrollY - 95) / 230, 0), 1);
-    subline.style.opacity = subReveal;
-    subline.style.transform = `translateY(${(1 - subReveal) * 10}px)`;
+          render();
+          state.animationId = requestAnimationFrame(step);
+        };
 
-    const logoOpacity = Math.max(0, 0.46 - reveal * 0.92);
-    logo.style.opacity = logoOpacity;
-    logo.style.visibility = logoOpacity < 0.02 ? 'hidden' : 'visible';
+        state.animationId = requestAnimationFrame(step);
+      }
 
-    const heroShift = Math.min(scrollY * 0.045, 16);
-    logoWrapper.style.transform = `translate3d(0, ${heroShift}px, 0)`;
+      function onPointerDown(event) {
+        event.preventDefault();
+        stage.classList.add('is-dragging');
+        state.isDragging = true;
+        state.lastPointerAngle = getPointerAngle(event);
+        state.lastPointerTime = performance.now();
+        cancelAnimationFrame(state.animationId);
+        stage.setPointerCapture(event.pointerId);
+      }
 
-    progressBar.style.width = `${progress * 100}%`;
-    scrollHint.style.opacity = scrollY > 140 ? '0' : '1';
-  }
+      function onPointerMove(event) {
+        if (!state.isDragging) {
+          return;
+        }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-</script>
+        const currentAngle = getPointerAngle(event);
+        const deltaAngle = normalizeDeltaAngle(currentAngle - state.lastPointerAngle);
+        const deltaDegrees = deltaAngle * (180 / Math.PI);
 
+        state.rotation += deltaDegrees;
+
+        const now = performance.now();
+        const deltaTime = Math.max(now - state.lastPointerTime, 1);
+        const rawVelocity = (deltaDegrees / deltaTime) * 16.67;
+        const clampedVelocity = Math.max(-physics.maxVelocity, Math.min(physics.maxVelocity, rawVelocity));
+
+        state.velocity += (clampedVelocity - state.velocity) * physics.dragSmoothing;
+
+        state.lastPointerAngle = currentAngle;
+        state.lastPointerTime = now;
+        render();
+      }
+
+      function onPointerUp(event) {
+        if (!state.isDragging) {
+          return;
+        }
+
+        state.isDragging = false;
+        stage.classList.remove('is-dragging');
+        stage.releasePointerCapture(event.pointerId);
+        beginInertia();
+      }
+
+      stage.addEventListener('pointerdown', onPointerDown);
+      stage.addEventListener('pointermove', onPointerMove);
+      stage.addEventListener('pointerup', onPointerUp);
+      stage.addEventListener('pointercancel', onPointerUp);
+
+      render();
+    })();
+  </script>
 </body>
 </html>
