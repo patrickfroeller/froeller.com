@@ -11,6 +11,7 @@
     :root {
       --page-bg: #efefef;
       --page-text: #111111;
+      --logo-color: #ffffff;
       --logo-size: clamp(180px, 25vmin, 320px);
     }
 
@@ -55,12 +56,21 @@
 
     .logo {
       width: 100%;
-      height: auto;
+      aspect-ratio: 1 / 1;
       display: block;
       pointer-events: none;
       will-change: transform;
       opacity: 0;
       animation: logoFadeIn 2200ms cubic-bezier(0.22, 1, 0.36, 1) 180ms forwards;
+      background: var(--logo-color);
+      -webkit-mask-image: url('logo.svg');
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      mask-image: url('logo.svg');
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
     }
 
     @keyframes logoFadeIn {
@@ -83,7 +93,7 @@
 </head>
 <body>
   <main class="logo-stage" id="logoStage" aria-label="Interaktives Logo">
-    <img src="logo.svg" alt="froeller.com Logo" class="logo" id="logo">
+    <div class="logo" id="logo" role="img" aria-label="froeller.com Logo"></div>
   </main>
 
   <script>
@@ -114,6 +124,44 @@
         };
       }
 
+      function hexToRgb(hex) {
+        const clean = hex.replace('#', '');
+        const normalized = clean.length === 3
+          ? clean.split('').map((part) => part + part).join('')
+          : clean;
+
+        return {
+          r: parseInt(normalized.slice(0, 2), 16),
+          g: parseInt(normalized.slice(2, 4), 16),
+          b: parseInt(normalized.slice(4, 6), 16)
+        };
+      }
+
+      function getContrastFromRgb(colorA, colorB) {
+        const lumA = getRelativeLuminance(colorA);
+        const lumB = getRelativeLuminance(colorB);
+        return getContrastRatio(Math.max(lumA, lumB), Math.min(lumA, lumB));
+      }
+
+      function pickLogoColorForBackground(background) {
+        const curatedPalette = [
+          '#111827', '#0f766e', '#14532d', '#1d4ed8', '#4338ca',
+          '#7c2d12', '#9f1239', '#7e22ce', '#b91c1c', '#0f172a',
+          '#f8fafc', '#fef3c7', '#dbeafe', '#dcfce7', '#fce7f3'
+        ];
+
+        const candidates = curatedPalette
+          .map((hex) => ({ hex, contrast: getContrastFromRgb(background, hexToRgb(hex)) }))
+          .sort((a, b) => b.contrast - a.contrast);
+
+        const strongCandidate = candidates.find((entry) => entry.contrast >= 3.5);
+        if (strongCandidate) {
+          return strongCandidate.hex;
+        }
+
+        return candidates[0]?.hex ?? '#ffffff';
+      }
+
       function applyAccessibleRandomBackground() {
         const background = randomRgbColor();
         const bgLuminance = getRelativeLuminance(background);
@@ -134,6 +182,7 @@
 
         document.documentElement.style.setProperty('--page-bg', bgCss);
         document.documentElement.style.setProperty('--page-text', textColor);
+        document.documentElement.style.setProperty('--logo-color', pickLogoColorForBackground(background));
       }
 
       applyAccessibleRandomBackground();
