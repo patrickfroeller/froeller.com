@@ -197,32 +197,43 @@
       function pickLogoColorForBackground(background) {
         const backgroundHsl = rgbToHsl(background);
         const isBgLight = getRelativeLuminance(background) > 0.45;
-        const hueOffsets = [150, 180, 210, 120, 240];
-        const saturationOptions = [72, 78, 84, 90, 96];
+        const hueOffsets = [30, 60, 90, 120, 150, 180, 210, 240, 300, 330];
+        const saturationOptions = [95, 100];
         const lightnessOptions = isBgLight
-          ? [24, 30, 36, 42, 48]
-          : [58, 64, 70, 76, 82];
+          ? [22, 28, 34, 40, 46]
+          : [56, 62, 68, 74];
 
         const candidates = [];
         for (const offset of hueOffsets) {
           for (const saturation of saturationOptions) {
             for (const lightness of lightnessOptions) {
-              const hue = (backgroundHsl.h + offset + Math.random() * 18 - 9 + 360) % 360;
+              const hue = (backgroundHsl.h + offset + Math.random() * 24 - 12 + 360) % 360;
               const candidateHsl = { h: hue, s: saturation, l: lightness };
               const candidateRgb = hslToRgb(candidateHsl);
               candidates.push({
                 css: `hsl(${Math.round(candidateHsl.h)} ${candidateHsl.s}% ${candidateHsl.l}%)`,
-                contrast: getContrastFromRgb(background, candidateRgb)
+                contrast: getContrastFromRgb(background, candidateRgb),
+                vividness: candidateHsl.s * (100 - Math.abs(candidateHsl.l - 50))
               });
             }
           }
         }
 
-        candidates.sort((a, b) => b.contrast - a.contrast);
+        candidates.sort((a, b) => {
+          if (b.contrast !== a.contrast) {
+            return b.contrast - a.contrast;
+          }
+          return b.vividness - a.vividness;
+        });
 
-        const vividMatch = candidates.find((entry) => entry.contrast >= 3);
-        if (vividMatch) {
-          return vividMatch.css;
+        const strongVividMatches = candidates.filter((entry) => entry.contrast >= 3.5);
+        if (strongVividMatches.length > 0) {
+          return strongVividMatches[Math.floor(Math.random() * strongVividMatches.length)].css;
+        }
+
+        const fallbackVividMatches = candidates.filter((entry) => entry.contrast >= 3);
+        if (fallbackVividMatches.length > 0) {
+          return fallbackVividMatches[Math.floor(Math.random() * fallbackVividMatches.length)].css;
         }
 
         return getContrastFromRgb(background, { r: 255, g: 255, b: 255 }) >= 4.5
