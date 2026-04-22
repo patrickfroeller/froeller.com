@@ -20,11 +20,23 @@
     transform: translate(-50%, -50%);
   }
 
+  .logo-rotator {
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .logo-rotator.is-dragging {
+    cursor: grabbing;
+  }
+
   .logo {
     width: 120px;
     animation: zoomIn 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     filter: blur(10px) brightness(1.2);
     opacity: 0;
+    display: block;
+    -webkit-user-drag: none;
   }
 
   @keyframes zoomIn {
@@ -74,8 +86,9 @@
 <body>
 
 <div class="logo-wrapper">
-  <!-- IMPORTANT: replace with your real path if not visible -->
-  <img src="logo.png" class="logo" id="logo" alt="Logo">
+  <div class="logo-rotator" id="logoRotator" aria-label="Rotate logo">
+    <img src="logo.png" class="logo" id="logo" alt="Logo">
+  </div>
 </div>
 
 <div class="headline" id="text">
@@ -92,6 +105,62 @@
     const progress = Math.min(window.scrollY / 300, 1);
     text.style.opacity = progress;
   });
+
+  // rotate logo like a phone dial by grabbing near the edge
+  const rotator = document.getElementById("logoRotator");
+  let isDragging = false;
+  let dragOffset = 0;
+  let currentRotation = 0;
+
+  const getAngleToCenter = (event) => {
+    const rect = rotator.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = event.clientX - cx;
+    const dy = event.clientY - cy;
+    return {
+      angle: Math.atan2(dy, dx) * (180 / Math.PI),
+      distance: Math.hypot(dx, dy),
+      radius: Math.min(rect.width, rect.height) / 2
+    };
+  };
+
+  const applyRotation = (angle) => {
+    currentRotation = angle;
+    rotator.style.transform = `rotate(${currentRotation}deg)`;
+  };
+
+  rotator.addEventListener("pointerdown", (event) => {
+    const { angle, distance, radius } = getAngleToCenter(event);
+    const edgeThreshold = radius * 0.62;
+
+    if (distance < edgeThreshold) return;
+
+    isDragging = true;
+    dragOffset = angle - currentRotation;
+    rotator.classList.add("is-dragging");
+    rotator.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+
+  rotator.addEventListener("pointermove", (event) => {
+    if (!isDragging) return;
+    const { angle } = getAngleToCenter(event);
+    applyRotation(angle - dragOffset);
+    event.preventDefault();
+  });
+
+  const stopDragging = (event) => {
+    if (!isDragging) return;
+    isDragging = false;
+    rotator.classList.remove("is-dragging");
+    if (event.pointerId !== undefined && rotator.hasPointerCapture(event.pointerId)) {
+      rotator.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  rotator.addEventListener("pointerup", stopDragging);
+  rotator.addEventListener("pointercancel", stopDragging);
 </script>
 
 </body>
