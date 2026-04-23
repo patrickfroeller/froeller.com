@@ -150,6 +150,7 @@
   <main class="logo-stage" id="logoStage" aria-label="Interaktives Logo">
     <div class="logo" id="logo" role="img" aria-label="froeller.com Logo"></div>
   </main>
+  <p class="site-footer">© <span id="copyrightYear"></span> Patrick Fröller. All rights reserved.</p>
 
   <section class="login-panel" aria-label="Family board login">
     <button id="showLogin" class="ui-btn" type="button">Login</button>
@@ -201,6 +202,11 @@
 
         window.location.href = window.location.protocol === 'file:' ? 'board.html' : '/board.html';
       });
+
+      const yearNode = document.getElementById('copyrightYear');
+      if (yearNode) {
+        yearNode.textContent = String(new Date().getFullYear());
+      }
 
       const stage = document.getElementById('logoStage');
       const logo = document.getElementById('logo');
