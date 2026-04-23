@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Board · froeller.com</title>
+  <meta name="description" content="Simple family board.">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="referrer" content="no-referrer">
+  <style>
+    :root {
+      --page-bg: #efefef;
+      --page-text: #111111;
+      --logo-color: #ffffff;
+      --ui-font: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--page-text);
+      font-family: var(--ui-font);
+    }
+
+    body {
+      padding: clamp(14px, 3vw, 28px);
+      display: grid;
+      place-items: center;
+    }
+
+    .board-wrap {
+      width: min(920px, 100%);
+      display: grid;
+      gap: 10px;
+    }
+
+    .board-input {
+      width: 100%;
+      min-height: min(70vh, 520px);
+      resize: vertical;
+      border: 1px solid color-mix(in srgb, var(--logo-color) 45%, transparent);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--page-bg) 70%, #ffffff 30%);
+      color: var(--page-text);
+      padding: 14px;
+      line-height: 1.4;
+      font-size: clamp(1rem, 2.6vw, 1.1rem);
+      outline: none;
+    }
+
+    .board-input:focus {
+      border-color: var(--logo-color);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--logo-color) 45%, transparent);
+    }
+
+    .save-btn {
+      justify-self: start;
+      border: 1px solid color-mix(in srgb, var(--logo-color) 70%, transparent);
+      background: color-mix(in srgb, var(--logo-color) 24%, transparent);
+      color: var(--page-text);
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 9px 20px;
+      cursor: pointer;
+    }
+
+    .save-state {
+      min-height: 1.1em;
+      font-size: 0.86rem;
+      opacity: 0.88;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="board-wrap">
+    <textarea id="board" class="board-input" placeholder="Write here..."></textarea>
+    <button id="save" class="save-btn" type="button">Save</button>
+    <p id="saveState" class="save-state" aria-live="polite"></p>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    (() => {
+      window.FroellerApp.applyAccessibleRandomBackground();
+
+      const boardEl = document.getElementById('board');
+      const saveButton = document.getElementById('save');
+      const saveState = document.getElementById('saveState');
+
+      boardEl.value = localStorage.getItem(window.FroellerApp.BOARD_KEY) || '';
+      boardEl.focus();
+
+      saveButton.addEventListener('click', () => {
+        localStorage.setItem(window.FroellerApp.BOARD_KEY, boardEl.value);
+        saveState.textContent = 'Saved';
+        window.setTimeout(() => {
+          saveState.textContent = '';
+        }, 1300);
+      });
+    })();
+  </script>
+</body>
+</html>
