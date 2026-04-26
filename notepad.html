@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,700;1,500;1,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0f1115;
@@ -15,7 +15,7 @@
       --text: #f4f6f8;
       --muted: #9ca3af;
       --accent: #7dd3fc;
-      --font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-family: 'Sora', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -171,7 +171,7 @@
   <main class="notepad" aria-label="Notepad">
     <header class="toolbar">
       <h1>froeller.com Notepad</h1>
-      <a href="index.html">Zurück</a>
+      <a href="index.html" id="backLink">Zurück</a>
     </header>
 
     <section class="gate" id="gate">
@@ -194,14 +194,27 @@
       const EXPECTED_PASSWORD = 'froeller';
 
       const gateForm = document.getElementById('gateForm');
+      const backLink = document.getElementById('backLink');
       const passwordInput = document.getElementById('passwordInput');
       const gateError = document.getElementById('gateError');
       const gate = document.getElementById('gate');
       const editor = document.getElementById('editor');
 
-      if (!gateForm || !passwordInput || !gateError || !gate || !editor) {
+      if (!gateForm || !passwordInput || !gateError || !gate || !editor || !backLink) {
         return;
       }
+
+      function resolvePageUrl(fileName) {
+        const currentUrl = window.location.href;
+        if (currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) {
+          const [previewBase, rawSource] = currentUrl.split('?');
+          const nextRaw = rawSource.replace(/\/[^/]*$/, `/${fileName}`);
+          return `${previewBase}?${nextRaw}`;
+        }
+        return fileName;
+      }
+
+      backLink.href = resolvePageUrl('index.html');
 
       gateForm.addEventListener('submit', (event) => {
         event.preventDefault();
