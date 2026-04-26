@@ -58,6 +58,10 @@
       will-change: transform;
     }
 
+    .brand-row.slide {
+      animation: slideToLeft 1020ms cubic-bezier(0.2, 0.85, 0.2, 1) 3400ms forwards;
+    }
+
     .logo {
       width: var(--logo-size);
       aspect-ratio: 1 / 1;
@@ -81,27 +85,28 @@
       will-change: transform;
     }
 
-    .logo.rotating {
-      cursor: grabbing;
-    }
+    .logo.rotating { cursor: grabbing; }
 
     .wordmark {
       margin: 0;
       min-height: 1em;
+      min-width: 1ch;
       font-size: clamp(2.15rem, 5.2vmin, 4.9rem);
-      font-weight: 900;
-      letter-spacing: -0.05em;
+      font-weight: 700;
+      letter-spacing: -0.04em;
       line-height: 0.9;
       color: var(--logo-color);
       white-space: nowrap;
     }
 
-    .char {
-      display: inline-block;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: charIn 420ms cubic-bezier(0.2, 0.95, 0.3, 1) forwards;
-      animation-delay: calc(2480ms + (var(--i) * 88ms));
+    .wordmark.typing {
+      border-right-color: currentColor;
+      animation: caretBlink 1s steps(1) 2300ms infinite;
+    }
+
+    .wordmark.done {
+      border-right-color: transparent;
+      animation: none;
     }
 
     .login-button {
@@ -117,12 +122,7 @@
       transform: translateY(16px) scale(0.97);
       pointer-events: none;
       cursor: pointer;
-      animation: buttonEnter 700ms cubic-bezier(0.16, 1, 0.3, 1) 4050ms forwards;
-    }
-
-    .login-button:focus-visible {
-      outline: 3px solid color-mix(in oklab, var(--logo-color) 70%, white);
-      outline-offset: 3px;
+      animation: buttonEnter 700ms cubic-bezier(0.16, 1, 0.3, 1) 4550ms forwards;
     }
 
     .site-footer {
@@ -133,7 +133,6 @@
       margin: 0;
       color: color-mix(in oklab, var(--logo-color) 78%, transparent);
       font-size: clamp(0.82rem, 1.4vmin, 1rem);
-      font-style: normal;
       letter-spacing: -0.01em;
       pointer-events: none;
       white-space: nowrap;
@@ -156,16 +155,11 @@
     }
 
     @keyframes buttonEnter {
-      from {
-        opacity: 0;
-        transform: translateY(16px) scale(0.97);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        pointer-events: auto;
-      }
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
     }
+
+    @keyframes caretBlink { 0%, 49% { border-right-color: currentColor; } 50%, 100% { border-right-color: transparent; } }
 
     @media (max-width: 720px) {
       .wordmark { font-size: clamp(1.72rem, 11.2vw, 3rem); }
@@ -196,35 +190,24 @@
     <button class="login-button" id="loginButton" type="button">Open Notes</button>
   </main>
 
+  <span class="measure-text" id="measureText">froeller.com</span>
   <p class="site-footer">© <span id="copyrightYear"></span> Patrick Fröller. All rights reserved.</p>
 
   <script>
     (() => {
+      const WORDMARK = 'froeller.com';
+
       function srgbToLinear(value) {
         const normalized = value / 255;
-        return normalized <= 0.04045
-          ? normalized / 12.92
-          : Math.pow((normalized + 0.055) / 1.055, 2.4);
+        return normalized <= 0.04045 ? normalized / 12.92 : Math.pow((normalized + 0.055) / 1.055, 2.4);
       }
 
       function getRelativeLuminance({ r, g, b }) {
-        const red = srgbToLinear(r);
-        const green = srgbToLinear(g);
-        const blue = srgbToLinear(b);
-        return red * 0.2126 + green * 0.7152 + blue * 0.0722;
+        return srgbToLinear(r) * 0.2126 + srgbToLinear(g) * 0.7152 + srgbToLinear(b) * 0.0722;
       }
 
-      function getContrastRatio(lighter, darker) {
-        return (lighter + 0.05) / (darker + 0.05);
-      }
-
-      function randomRgbColor() {
-        return {
-          r: Math.floor(Math.random() * 256),
-          g: Math.floor(Math.random() * 256),
-          b: Math.floor(Math.random() * 256)
-        };
-      }
+      function getContrastRatio(lighter, darker) { return (lighter + 0.05) / (darker + 0.05); }
+      function randomRgbColor() { return { r: Math.floor(Math.random() * 256), g: Math.floor(Math.random() * 256), b: Math.floor(Math.random() * 256) }; }
 
       function rgbToHsl({ r, g, b }) {
         const red = r / 255;
@@ -233,28 +216,15 @@
         const max = Math.max(red, green, blue);
         const min = Math.min(red, green, blue);
         const delta = max - min;
-
         let hue = 0;
         if (delta !== 0) {
-          if (max === red) {
-            hue = ((green - blue) / delta) % 6;
-          } else if (max === green) {
-            hue = (blue - red) / delta + 2;
-          } else {
-            hue = (red - green) / delta + 4;
-          }
+          if (max === red) hue = ((green - blue) / delta) % 6;
+          else if (max === green) hue = (blue - red) / delta + 2;
+          else hue = (red - green) / delta + 4;
         }
-
         const lightness = (max + min) / 2;
-        const saturation = delta === 0
-          ? 0
-          : delta / (1 - Math.abs(2 * lightness - 1));
-
-        return {
-          h: ((hue * 60) + 360) % 360,
-          s: saturation * 100,
-          l: lightness * 100
-        };
+        const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+        return { h: ((hue * 60) + 360) % 360, s: saturation * 100, l: lightness * 100 };
       }
 
       function hslToRgb({ h, s, l }) {
@@ -263,31 +233,15 @@
         const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
         const hueSection = h / 60;
         const x = chroma * (1 - Math.abs((hueSection % 2) - 1));
-
-        let red = 0;
-        let green = 0;
-        let blue = 0;
-
-        if (hueSection >= 0 && hueSection < 1) {
-          red = chroma; green = x; blue = 0;
-        } else if (hueSection >= 1 && hueSection < 2) {
-          red = x; green = chroma; blue = 0;
-        } else if (hueSection >= 2 && hueSection < 3) {
-          red = 0; green = chroma; blue = x;
-        } else if (hueSection >= 3 && hueSection < 4) {
-          red = 0; green = x; blue = chroma;
-        } else if (hueSection >= 4 && hueSection < 5) {
-          red = x; green = 0; blue = chroma;
-        } else {
-          red = chroma; green = 0; blue = x;
-        }
-
+        let red = 0; let green = 0; let blue = 0;
+        if (hueSection < 1) { red = chroma; green = x; }
+        else if (hueSection < 2) { red = x; green = chroma; }
+        else if (hueSection < 3) { green = chroma; blue = x; }
+        else if (hueSection < 4) { green = x; blue = chroma; }
+        else if (hueSection < 5) { red = x; blue = chroma; }
+        else { red = chroma; blue = x; }
         const match = lightness - chroma / 2;
-        return {
-          r: Math.round((red + match) * 255),
-          g: Math.round((green + match) * 255),
-          b: Math.round((blue + match) * 255)
-        };
+        return { r: Math.round((red + match) * 255), g: Math.round((green + match) * 255), b: Math.round((blue + match) * 255) };
       }
 
       function getContrastFromRgb(colorA, colorB) {
@@ -299,67 +253,32 @@
       function pickLogoColorForBackground(background) {
         const backgroundHsl = rgbToHsl(background);
         const isBgLight = getRelativeLuminance(background) > 0.45;
-        const hueOffsets = [30, 60, 90, 120, 150, 180, 210, 240, 300, 330];
-        const saturationOptions = [95, 100];
-        const lightnessOptions = isBgLight
-          ? [22, 28, 34, 40, 46]
-          : [56, 62, 68, 74];
-
+        const lightnessOptions = isBgLight ? [24, 30, 36, 42] : [58, 64, 70];
         const candidates = [];
-        for (const offset of hueOffsets) {
-          for (const saturation of saturationOptions) {
+
+        for (const offset of [40, 80, 120, 160, 200, 240, 280, 320]) {
+          for (const saturation of [90, 100]) {
             for (const lightness of lightnessOptions) {
-              const hue = (backgroundHsl.h + offset + Math.random() * 24 - 12 + 360) % 360;
+              const hue = (backgroundHsl.h + offset + 360) % 360;
               const candidateHsl = { h: hue, s: saturation, l: lightness };
               const candidateRgb = hslToRgb(candidateHsl);
-              candidates.push({
-                css: `hsl(${Math.round(candidateHsl.h)} ${candidateHsl.s}% ${candidateHsl.l}%)`,
-                contrast: getContrastFromRgb(background, candidateRgb),
-                vividness: candidateHsl.s * (100 - Math.abs(candidateHsl.l - 50))
-              });
+              candidates.push({ css: `hsl(${Math.round(hue)} ${saturation}% ${lightness}%)`, contrast: getContrastFromRgb(background, candidateRgb) });
             }
           }
         }
 
-        candidates.sort((a, b) => {
-          if (b.contrast !== a.contrast) {
-            return b.contrast - a.contrast;
-          }
-          return b.vividness - a.vividness;
-        });
-
-        const strongVividMatches = candidates.filter((entry) => entry.contrast >= 3.5);
-        if (strongVividMatches.length > 0) {
-          return strongVividMatches[Math.floor(Math.random() * strongVividMatches.length)].css;
-        }
-
-        const fallbackVividMatches = candidates.filter((entry) => entry.contrast >= 3);
-        if (fallbackVividMatches.length > 0) {
-          return fallbackVividMatches[Math.floor(Math.random() * fallbackVividMatches.length)].css;
-        }
-
-        return getContrastFromRgb(background, { r: 255, g: 255, b: 255 }) >= 4.5
-          ? '#ffffff'
-          : '#000000';
+        const accessible = candidates.filter((entry) => entry.contrast >= 3.2);
+        return accessible.length > 0 ? accessible[Math.floor(Math.random() * accessible.length)].css : '#ffffff';
       }
 
       function applyAccessibleRandomBackground() {
         const background = randomRgbColor();
         const bgLuminance = getRelativeLuminance(background);
-
-        const blackLuminance = 0;
-        const whiteLuminance = 1;
-        const contrastWithBlack = getContrastRatio(
-          Math.max(bgLuminance, blackLuminance),
-          Math.min(bgLuminance, blackLuminance)
-        );
-        const contrastWithWhite = getContrastRatio(
-          Math.max(bgLuminance, whiteLuminance),
-          Math.min(bgLuminance, whiteLuminance)
-        );
-
+        const contrastWithBlack = getContrastRatio(Math.max(bgLuminance, 0), Math.min(bgLuminance, 0));
+        const contrastWithWhite = getContrastRatio(Math.max(bgLuminance, 1), Math.min(bgLuminance, 1));
         const textColor = contrastWithBlack >= contrastWithWhite ? '#000000' : '#ffffff';
         const bgCss = `rgb(${background.r} ${background.g} ${background.b})`;
+        const logoColor = pickLogoColorForBackground(background);
 
         document.documentElement.style.setProperty('--page-bg', bgCss);
         document.documentElement.style.setProperty('--page-text', textColor);
@@ -379,24 +298,39 @@
         }
       }
 
-      function renderWordmark() {
-        const wordmark = document.getElementById('wordmark');
-        if (!wordmark) {
-          return;
+        try {
+          window.localStorage.setItem('froellerTheme', JSON.stringify({ pageBg: bgCss, pageText: textColor, logoColor }));
+        } catch (error) {
+          console.debug('Theme persistence unavailable', error);
         }
-
-        const text = 'froeller.com';
-        wordmark.textContent = '';
-
-        [...text].forEach((character, index) => {
-          const span = document.createElement('span');
-          span.className = 'char';
-          span.style.setProperty('--i', String(index));
-          span.textContent = character;
-          wordmark.appendChild(span);
-        });
       }
 
+
+      function typeWordmark() {
+        const wordmark = document.getElementById('wordmark');
+        const brandRow = document.getElementById('brandRow');
+        if (!wordmark || !brandRow) return;
+
+        wordmark.textContent = '';
+        wordmark.classList.add('typing');
+        const startDelay = 2300;
+        const charInterval = 95;
+
+        window.setTimeout(() => {
+          let index = 0;
+          const timer = window.setInterval(() => {
+            index += 1;
+            wordmark.textContent = WORDMARK.slice(0, index);
+            if (index >= WORDMARK.length) {
+              window.clearInterval(timer);
+              wordmark.classList.remove('typing');
+              wordmark.classList.add('done');
+            }
+          }, charInterval);
+        }, startDelay);
+
+        brandRow.classList.add('slide');
+      }
 
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
@@ -426,10 +360,7 @@
 
       function enableLogoDialInteraction() {
         const logo = document.querySelector('.logo');
-        if (!logo) {
-          return;
-        }
-
+        if (!logo) return;
         let activePointerId = null;
         let lastPointerAngle = 0;
         let currentRotation = 0;
@@ -445,9 +376,7 @@
           const bounds = logo.getBoundingClientRect();
           const centerX = bounds.left + bounds.width / 2;
           const centerY = bounds.top + bounds.height / 2;
-          const deltaX = event.clientX - centerX;
-          const deltaY = event.clientY - centerY;
-          return Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+          return Math.atan2(event.clientY - centerY, event.clientX - centerX) * (180 / Math.PI);
         }
 
         function setRotation(degrees) {
@@ -461,7 +390,6 @@
             springBackFrame = null;
             return;
           }
-
           springVelocity += (0 - currentRotation) * 0.11;
           springVelocity *= 0.82;
           setRotation(currentRotation + springVelocity);
@@ -469,15 +397,8 @@
         }
 
         logo.addEventListener('pointerdown', (event) => {
-          if (event.button !== 0) {
-            return;
-          }
-
-          if (springBackFrame) {
-            window.cancelAnimationFrame(springBackFrame);
-            springBackFrame = null;
-          }
-
+          if (event.button !== 0) return;
+          if (springBackFrame) { window.cancelAnimationFrame(springBackFrame); springBackFrame = null; }
           activePointerId = event.pointerId;
           logo.setPointerCapture(activePointerId);
           logo.classList.add('rotating');
@@ -487,33 +408,41 @@
         });
 
         logo.addEventListener('pointermove', (event) => {
-          if (activePointerId !== event.pointerId) {
-            return;
-          }
-
+          if (activePointerId !== event.pointerId) return;
           const pointerAngle = angleFromPointer(event);
           const delta = normalizeAngle(pointerAngle - lastPointerAngle);
           lastPointerAngle = pointerAngle;
-          const next = currentRotation + delta;
-          setRotation(Math.max(-160, Math.min(160, next)));
+          setRotation(Math.max(-160, Math.min(160, currentRotation + delta)));
         });
 
         function releasePointer(event) {
-          if (activePointerId !== event.pointerId) {
-            return;
-          }
-
+          if (activePointerId !== event.pointerId) return;
           logo.classList.remove('rotating');
           logo.releasePointerCapture(activePointerId);
           activePointerId = null;
-          if (!springBackFrame) {
-            springBackFrame = window.requestAnimationFrame(animateBack);
-          }
+          if (!springBackFrame) springBackFrame = window.requestAnimationFrame(animateBack);
         }
 
         logo.addEventListener('pointerup', releasePointer);
         logo.addEventListener('pointercancel', releasePointer);
       }
+
+      applyAccessibleRandomBackground();
+      setSlideTarget();
+      typeWordmark();
+      enableLogoDialInteraction();
+
+      const yearNode = document.getElementById('copyrightYear');
+      if (yearNode) yearNode.textContent = String(new Date().getFullYear());
+
+      const loginButton = document.getElementById('loginButton');
+      if (loginButton) {
+        loginButton.addEventListener('click', () => {
+          window.location.href = resolvePageUrl('notes.html');
+        });
+      }
+
+      window.addEventListener('resize', setSlideTarget);
     })();
   </script>
 </body>
