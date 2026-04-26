@@ -10,15 +10,15 @@
   <meta name="referrer" content="no-referrer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,700;1,500;1,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --page-bg: #efefef;
       --page-text: #111111;
       --logo-color: #ffffff;
-      --logo-size: clamp(116px, 14vmin, 176px);
+      --logo-size: clamp(104px, 12.4vmin, 156px);
       --gap: clamp(14px, 2.2vmin, 24px);
-      --font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-family: 'Sora', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       --move-left: clamp(-92px, -9.5vw, -128px);
     }
 
@@ -90,12 +90,14 @@
       margin: 0;
       min-height: 1em;
       font-size: clamp(2.15rem, 5.2vmin, 4.9rem);
-      font-weight: 800;
-      font-style: italic;
-      letter-spacing: -0.045em;
+      font-weight: 900;
+      letter-spacing: -0.05em;
       line-height: 0.9;
       color: var(--logo-color);
       white-space: nowrap;
+      max-width: 0;
+      overflow: hidden;
+      animation: revealWordmark 1ms linear 2480ms forwards;
     }
 
     .char {
@@ -107,13 +109,13 @@
     }
 
     .login-button {
-      border: 1.5px solid color-mix(in oklab, var(--logo-color) 70%, transparent);
+      border: 1.5px solid transparent;
       border-radius: 999px;
       padding: 0.78rem 2rem;
-      font: italic 600 clamp(0.96rem, 1.7vmin, 1.1rem) / 1 var(--font-family);
+      font: 700 clamp(0.96rem, 1.7vmin, 1.1rem) / 1 var(--font-family);
       letter-spacing: -0.01em;
-      background: color-mix(in oklab, var(--logo-color) 10%, transparent);
-      color: var(--logo-color);
+      background: var(--logo-color);
+      color: var(--page-bg);
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
       opacity: 0;
       transform: translateY(16px) scale(0.97);
@@ -162,6 +164,11 @@
       }
     }
 
+    @keyframes revealWordmark {
+      from { max-width: 0; }
+      to { max-width: 16ch; }
+    }
+
     @keyframes buttonEnter {
       from {
         opacity: 0;
@@ -180,7 +187,7 @@
       }
 
       .wordmark { font-size: clamp(1.72rem, 11.2vw, 3rem); }
-      .logo { width: clamp(88px, 28vw, 126px); }
+      .logo { width: clamp(80px, 25vw, 112px); }
       .brand-row { gap: clamp(10px, 3vw, 18px); }
     }
 
@@ -395,6 +402,16 @@
         });
       }
 
+      function resolvePageUrl(fileName) {
+        const currentUrl = window.location.href;
+        if (currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) {
+          const [previewBase, rawSource] = currentUrl.split('?');
+          const nextRaw = rawSource.replace(/\/[^/]*$/, `/${fileName}`);
+          return `${previewBase}?${nextRaw}`;
+        }
+        return fileName;
+      }
+
       applyAccessibleRandomBackground();
       renderWordmark();
       enableLogoDialInteraction();
@@ -407,7 +424,7 @@
       const loginButton = document.getElementById('loginButton');
       if (loginButton) {
         loginButton.addEventListener('click', () => {
-          window.location.href = 'notepad.html';
+          window.location.href = resolvePageUrl('notepad.html');
         });
       }
 
