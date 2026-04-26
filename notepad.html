@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>froeller.com — Notepad</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,700;1,500;1,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a20;
+      --text: #f4f6f8;
+      --muted: #9ca3af;
+      --accent: #7dd3fc;
+      --font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(circle at top right, #1d2230, var(--bg) 58%);
+      color: var(--text);
+      font-family: var(--font-family);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: clamp(16px, 4vw, 32px);
+    }
+
+    .notepad {
+      width: min(920px, 100%);
+      height: min(680px, 100%);
+      background: color-mix(in oklab, var(--panel) 88%, black);
+      border: 1px solid color-mix(in oklab, white 12%, transparent);
+      border-radius: 22px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid color-mix(in oklab, white 10%, transparent);
+      background: color-mix(in oklab, var(--panel) 72%, black);
+    }
+
+    .toolbar h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      font-style: italic;
+      letter-spacing: -0.02em;
+    }
+
+    .toolbar a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      font-style: italic;
+      font-size: 0.95rem;
+    }
+
+    .gate,
+    .editor {
+      height: 100%;
+      width: 100%;
+    }
+
+    .gate {
+      display: grid;
+      place-items: center;
+      padding: clamp(18px, 4vw, 28px);
+    }
+
+    .gate-card {
+      width: min(460px, 100%);
+      display: grid;
+      gap: 12px;
+    }
+
+    .gate-title {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+      font-weight: 700;
+      font-style: italic;
+      letter-spacing: -0.03em;
+    }
+
+    .gate-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .gate-input {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid color-mix(in oklab, white 14%, transparent);
+      background: color-mix(in oklab, var(--panel) 84%, black);
+      color: var(--text);
+      font: 500 1rem/1.2 var(--font-family);
+      padding: 0.78rem 0.95rem;
+      outline: none;
+    }
+
+    .gate-input:focus-visible {
+      border-color: color-mix(in oklab, var(--accent) 56%, white);
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 26%, transparent);
+    }
+
+    .gate-button {
+      justify-self: start;
+      border: 1px solid color-mix(in oklab, var(--accent) 46%, transparent);
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--accent) 16%, transparent);
+      color: var(--text);
+      font: italic 600 0.96rem/1 var(--font-family);
+      letter-spacing: -0.01em;
+      padding: 0.72rem 1.3rem;
+      cursor: pointer;
+    }
+
+    .gate-error {
+      min-height: 1.2em;
+      margin: 0;
+      color: #fca5a5;
+      font-size: 0.9rem;
+    }
+
+    .editor {
+      display: none;
+    }
+
+    .editor.is-unlocked {
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      font: 500 1.02rem/1.6 var(--font-family);
+      padding: clamp(16px, 2.8vw, 28px);
+      caret-color: var(--accent);
+    }
+
+    textarea::placeholder {
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="notepad" aria-label="Notepad">
+    <header class="toolbar">
+      <h1>froeller.com Notepad</h1>
+      <a href="index.html">Zurück</a>
+    </header>
+
+    <section class="gate" id="gate">
+      <form class="gate-card" id="gateForm">
+        <h2 class="gate-title">Passwort eingeben</h2>
+        <p class="gate-subtitle">Zum Öffnen des Notepads bitte zuerst ein Passwort eingeben.</p>
+        <input class="gate-input" id="passwordInput" type="password" placeholder="Passwort" autocomplete="current-password" required>
+        <button class="gate-button" type="submit">Notepad öffnen</button>
+        <p class="gate-error" id="gateError" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="editor" id="editor">
+      <textarea placeholder="Schreibe hier deine Notizen …"></textarea>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const EXPECTED_PASSWORD = 'froeller';
+
+      const gateForm = document.getElementById('gateForm');
+      const passwordInput = document.getElementById('passwordInput');
+      const gateError = document.getElementById('gateError');
+      const gate = document.getElementById('gate');
+      const editor = document.getElementById('editor');
+
+      if (!gateForm || !passwordInput || !gateError || !gate || !editor) {
+        return;
+      }
+
+      gateForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        if (passwordInput.value === EXPECTED_PASSWORD) {
+          gate.style.display = 'none';
+          editor.classList.add('is-unlocked');
+          return;
+        }
+
+        gateError.textContent = 'Passwort falsch. Bitte erneut versuchen.';
+      });
+    })();
+  </script>
+</body>
+</html>
