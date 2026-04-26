@@ -94,6 +94,8 @@
       line-height: 0.9;
       color: var(--logo-color);
       white-space: nowrap;
+      border-right: 2px solid transparent;
+      padding-right: 0.06em;
     }
 
     .char {
@@ -139,6 +141,16 @@
       white-space: nowrap;
     }
 
+    .measure-text {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      visibility: hidden;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
+
     @keyframes logoFadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -167,6 +179,13 @@
       }
     }
 
+    @keyframes slideToLeft {
+      from { transform: translateX(0); }
+      to { transform: translateX(var(--slide-x, 0px)); }
+    }
+
+    @keyframes caretBlink { 0%, 49% { border-right-color: currentColor; } 50%, 100% { border-right-color: transparent; } }
+
     @media (max-width: 720px) {
       .wordmark { font-size: clamp(1.72rem, 11.2vw, 3rem); }
       .logo { width: clamp(80px, 25vw, 112px); }
@@ -189,7 +208,7 @@
 </head>
 <body>
   <main class="hero" aria-label="Logo and entry">
-    <div class="brand-row">
+    <div class="brand-row" id="brandRow">
       <div class="logo" role="img" aria-label="froeller.com Logo"></div>
       <h1 class="wordmark" id="wordmark" aria-label="froeller.com"></h1>
     </div>
@@ -363,7 +382,6 @@
 
         document.documentElement.style.setProperty('--page-bg', bgCss);
         document.documentElement.style.setProperty('--page-text', textColor);
-        const logoColor = pickLogoColorForBackground(background);
         document.documentElement.style.setProperty('--logo-color', logoColor);
 
         const themeState = {
@@ -379,6 +397,7 @@
         }
       }
 
+      function typeWordmark() {
       function renderWordmark() {
         const wordmark = document.getElementById('wordmark');
         if (!wordmark) {
@@ -397,6 +416,27 @@
         });
       }
 
+      function setSlideTarget() {
+        const brandRow = document.getElementById('brandRow');
+        const logo = document.querySelector('.logo');
+        const measureText = document.getElementById('measureText');
+        const wordmark = document.getElementById('wordmark');
+        if (!brandRow || !logo || !measureText || !wordmark) return;
+
+        const wordmarkStyle = window.getComputedStyle(wordmark);
+        measureText.style.font = wordmarkStyle.font;
+        measureText.style.letterSpacing = wordmarkStyle.letterSpacing;
+        measureText.style.fontWeight = wordmarkStyle.fontWeight;
+        measureText.textContent = WORDMARK;
+
+        const wordmarkWidth = measureText.getBoundingClientRect().width;
+        const logoWidth = logo.getBoundingClientRect().width;
+        const rowStyle = window.getComputedStyle(brandRow);
+        const gap = parseFloat(rowStyle.gap || rowStyle.columnGap || '0') || 0;
+
+        const shiftX = -((wordmarkWidth + gap) / 2) + (logoWidth / 2);
+        brandRow.style.setProperty('--slide-x', `${Math.round(shiftX)}px`);
+      }
 
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
@@ -406,22 +446,6 @@
           return `${previewBase}?${nextRaw}`;
         }
         return fileName;
-      }
-
-      applyAccessibleRandomBackground();
-      renderWordmark();
-      enableLogoDialInteraction();
-
-      const yearNode = document.getElementById('copyrightYear');
-      if (yearNode) {
-        yearNode.textContent = String(new Date().getFullYear());
-      }
-
-      const loginButton = document.getElementById('loginButton');
-      if (loginButton) {
-        loginButton.addEventListener('click', () => {
-          window.location.href = resolvePageUrl('notes.html');
-        });
       }
 
       function enableLogoDialInteraction() {
@@ -514,6 +538,27 @@
         logo.addEventListener('pointerup', releasePointer);
         logo.addEventListener('pointercancel', releasePointer);
       }
+
+      function init() {
+        applyAccessibleRandomBackground();
+        setSlideTarget();
+        typeWordmark();
+        enableLogoDialInteraction();
+
+        const yearNode = document.getElementById('copyrightYear');
+        if (yearNode) yearNode.textContent = String(new Date().getFullYear());
+
+        const loginButton = document.getElementById('loginButton');
+        if (loginButton) {
+          loginButton.addEventListener('click', () => {
+            window.location.href = resolvePageUrl('notes.html');
+          });
+        }
+
+        window.addEventListener('resize', setSlideTarget);
+      }
+
+      init();
     })();
   </script>
 </body>
