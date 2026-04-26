@@ -10,7 +10,7 @@
   <meta name="referrer" content="no-referrer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --page-bg: #efefef;
@@ -18,8 +18,7 @@
       --logo-color: #ffffff;
       --logo-size: clamp(104px, 12.4vmin, 156px);
       --gap: clamp(14px, 2.2vmin, 24px);
-      --font-family: 'Quicksand', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      --move-left: 0px;
+      --font-family: 'Nunito Sans', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -55,6 +54,7 @@
       justify-content: center;
       gap: var(--gap);
       transform: translateX(0);
+      animation: none;
       will-change: transform;
     }
 
@@ -97,9 +97,6 @@
       line-height: 0.9;
       color: var(--logo-color);
       white-space: nowrap;
-      overflow: hidden;
-      width: var(--wordmark-width, 11ch);
-      border-right: 0.08em solid transparent;
     }
 
     .wordmark.typing {
@@ -141,17 +138,21 @@
       white-space: nowrap;
     }
 
-    .measure-text {
-      position: absolute;
-      visibility: hidden;
-      pointer-events: none;
-      white-space: nowrap;
-      font: 700 clamp(2.15rem, 5.2vmin, 4.9rem) / 0.9 var(--font-family);
-      letter-spacing: -0.04em;
+    @keyframes logoFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    @keyframes logoFadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideToLeft { from { transform: translateX(0); } to { transform: translateX(var(--move-left)); } }
+    @keyframes charIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     @keyframes buttonEnter {
       from { opacity: 0; transform: translateY(16px) scale(0.97); }
@@ -165,15 +166,28 @@
       .logo { width: clamp(80px, 25vw, 112px); }
       .brand-row { gap: clamp(10px, 3vw, 18px); }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo,
+      .brand-row,
+      .char,
+      .login-button {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+
+      .login-button { pointer-events: auto; }
+    }
   </style>
 </head>
 <body>
   <main class="hero" aria-label="Logo and entry">
-    <div class="brand-row" id="brandRow">
+    <div class="brand-row">
       <div class="logo" role="img" aria-label="froeller.com Logo"></div>
       <h1 class="wordmark" id="wordmark" aria-label="froeller.com"></h1>
     </div>
-    <button class="login-button" id="loginButton" type="button">Login</button>
+    <button class="login-button" id="loginButton" type="button">Open Notes</button>
   </main>
 
   <span class="measure-text" id="measureText">froeller.com</span>
@@ -268,7 +282,21 @@
 
         document.documentElement.style.setProperty('--page-bg', bgCss);
         document.documentElement.style.setProperty('--page-text', textColor);
+        const logoColor = pickLogoColorForBackground(background);
         document.documentElement.style.setProperty('--logo-color', logoColor);
+
+        const themeState = {
+          pageBg: bgCss,
+          pageText: textColor,
+          logoColor
+        };
+
+        try {
+          window.localStorage.setItem('froellerTheme', JSON.stringify(themeState));
+        } catch (error) {
+          console.debug('Theme persistence unavailable', error);
+        }
+      }
 
         try {
           window.localStorage.setItem('froellerTheme', JSON.stringify({ pageBg: bgCss, pageText: textColor, logoColor }));
@@ -277,19 +305,6 @@
         }
       }
 
-      function setSlideTarget() {
-        const brandRow = document.getElementById('brandRow');
-        const logo = document.querySelector('.logo');
-        const measureText = document.getElementById('measureText');
-        const wordmark = document.getElementById('wordmark');
-        if (!brandRow || !logo || !measureText || !wordmark) return;
-
-        const wordmarkWidth = measureText.getBoundingClientRect().width;
-        wordmark.style.setProperty('--wordmark-width', `${Math.ceil(wordmarkWidth)}px`);
-        const logoWidth = logo.getBoundingClientRect().width;
-        const offset = -Math.max(0, (wordmarkWidth - logoWidth) / 2);
-        document.documentElement.style.setProperty('--move-left', `${Math.round(offset)}px`);
-      }
 
       function typeWordmark() {
         const wordmark = document.getElementById('wordmark');
@@ -325,6 +340,22 @@
           return `${previewBase}?${nextRaw}`;
         }
         return fileName;
+      }
+
+      applyAccessibleRandomBackground();
+      renderWordmark();
+      enableLogoDialInteraction();
+
+      const yearNode = document.getElementById('copyrightYear');
+      if (yearNode) {
+        yearNode.textContent = String(new Date().getFullYear());
+      }
+
+      const loginButton = document.getElementById('loginButton');
+      if (loginButton) {
+        loginButton.addEventListener('click', () => {
+          window.location.href = resolvePageUrl('notes.html');
+        });
       }
 
       function enableLogoDialInteraction() {
