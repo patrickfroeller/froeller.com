@@ -97,6 +97,8 @@
       line-height: 0.9;
       color: var(--logo-color);
       white-space: nowrap;
+      border-right: 2px solid transparent;
+      padding-right: 0.06em;
     }
 
     .wordmark.typing {
@@ -138,6 +140,16 @@
       white-space: nowrap;
     }
 
+    .measure-text {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      visibility: hidden;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
+
     @keyframes logoFadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -157,6 +169,11 @@
     @keyframes buttonEnter {
       from { opacity: 0; transform: translateY(16px) scale(0.97); }
       to { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    }
+
+    @keyframes slideToLeft {
+      from { transform: translateX(0); }
+      to { transform: translateX(var(--slide-x, 0px)); }
     }
 
     @keyframes caretBlink { 0%, 49% { border-right-color: currentColor; } 50%, 100% { border-right-color: transparent; } }
@@ -183,7 +200,7 @@
 </head>
 <body>
   <main class="hero" aria-label="Logo and entry">
-    <div class="brand-row">
+    <div class="brand-row" id="brandRow">
       <div class="logo" role="img" aria-label="froeller.com Logo"></div>
       <h1 class="wordmark" id="wordmark" aria-label="froeller.com"></h1>
     </div>
@@ -282,7 +299,6 @@
 
         document.documentElement.style.setProperty('--page-bg', bgCss);
         document.documentElement.style.setProperty('--page-text', textColor);
-        const logoColor = pickLogoColorForBackground(background);
         document.documentElement.style.setProperty('--logo-color', logoColor);
 
         const themeState = {
@@ -297,14 +313,6 @@
           console.debug('Theme persistence unavailable', error);
         }
       }
-
-        try {
-          window.localStorage.setItem('froellerTheme', JSON.stringify({ pageBg: bgCss, pageText: textColor, logoColor }));
-        } catch (error) {
-          console.debug('Theme persistence unavailable', error);
-        }
-      }
-
 
       function typeWordmark() {
         const wordmark = document.getElementById('wordmark');
@@ -332,6 +340,28 @@
         brandRow.classList.add('slide');
       }
 
+      function setSlideTarget() {
+        const brandRow = document.getElementById('brandRow');
+        const logo = document.querySelector('.logo');
+        const measureText = document.getElementById('measureText');
+        const wordmark = document.getElementById('wordmark');
+        if (!brandRow || !logo || !measureText || !wordmark) return;
+
+        const wordmarkStyle = window.getComputedStyle(wordmark);
+        measureText.style.font = wordmarkStyle.font;
+        measureText.style.letterSpacing = wordmarkStyle.letterSpacing;
+        measureText.style.fontWeight = wordmarkStyle.fontWeight;
+        measureText.textContent = WORDMARK;
+
+        const wordmarkWidth = measureText.getBoundingClientRect().width;
+        const logoWidth = logo.getBoundingClientRect().width;
+        const rowStyle = window.getComputedStyle(brandRow);
+        const gap = parseFloat(rowStyle.gap || rowStyle.columnGap || '0') || 0;
+
+        const shiftX = -((wordmarkWidth + gap) / 2) + (logoWidth / 2);
+        brandRow.style.setProperty('--slide-x', `${Math.round(shiftX)}px`);
+      }
+
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
         if (currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) {
@@ -340,22 +370,6 @@
           return `${previewBase}?${nextRaw}`;
         }
         return fileName;
-      }
-
-      applyAccessibleRandomBackground();
-      renderWordmark();
-      enableLogoDialInteraction();
-
-      const yearNode = document.getElementById('copyrightYear');
-      if (yearNode) {
-        yearNode.textContent = String(new Date().getFullYear());
-      }
-
-      const loginButton = document.getElementById('loginButton');
-      if (loginButton) {
-        loginButton.addEventListener('click', () => {
-          window.location.href = resolvePageUrl('notes.html');
-        });
       }
 
       function enableLogoDialInteraction() {
@@ -427,22 +441,26 @@
         logo.addEventListener('pointercancel', releasePointer);
       }
 
-      applyAccessibleRandomBackground();
-      setSlideTarget();
-      typeWordmark();
-      enableLogoDialInteraction();
+      function init() {
+        applyAccessibleRandomBackground();
+        setSlideTarget();
+        typeWordmark();
+        enableLogoDialInteraction();
 
-      const yearNode = document.getElementById('copyrightYear');
-      if (yearNode) yearNode.textContent = String(new Date().getFullYear());
+        const yearNode = document.getElementById('copyrightYear');
+        if (yearNode) yearNode.textContent = String(new Date().getFullYear());
 
-      const loginButton = document.getElementById('loginButton');
-      if (loginButton) {
-        loginButton.addEventListener('click', () => {
-          window.location.href = resolvePageUrl('notes.html');
-        });
+        const loginButton = document.getElementById('loginButton');
+        if (loginButton) {
+          loginButton.addEventListener('click', () => {
+            window.location.href = resolvePageUrl('notes.html');
+          });
+        }
+
+        window.addEventListener('resize', setSlideTarget);
       }
 
-      window.addEventListener('resize', setSlideTarget);
+      init();
     })();
   </script>
 </body>
