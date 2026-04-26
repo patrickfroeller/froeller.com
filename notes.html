@@ -9,15 +9,14 @@
   <meta name="referrer" content="no-referrer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #efefef;
-      --panel: color-mix(in oklab, #ffffff 96%, #efefef);
       --text: #111111;
-      --muted: color-mix(in oklab, var(--text) 65%, transparent);
+      --muted: color-mix(in oklab, var(--text) 66%, transparent);
       --accent: #ffffff;
-      --font-family: 'Nunito Sans', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-family: 'Quicksand', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -41,14 +40,13 @@
     .notes {
       width: min(960px, 100%);
       height: min(700px, 100%);
-      background: var(--panel);
-      border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
+      background: transparent;
+      border: 1px solid color-mix(in oklab, var(--text) 20%, transparent);
       border-radius: 22px;
-      box-shadow: 0 20px 80px color-mix(in oklab, var(--text) 24%, transparent);
+      box-shadow: 0 20px 80px color-mix(in oklab, var(--text) 20%, transparent);
       display: grid;
       grid-template-rows: auto 1fr;
       overflow: hidden;
-      backdrop-filter: blur(8px);
     }
 
     .toolbar {
@@ -57,27 +55,18 @@
       justify-content: space-between;
       gap: 12px;
       padding: 14px 18px;
-      border-bottom: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
-      background: color-mix(in oklab, var(--panel) 86%, var(--bg));
+      border-bottom: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
+      background: transparent;
     }
 
-    .toolbar h1 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-    }
+    .toolbar h1 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
 
-    .toolbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .toolbar-actions { display: flex; align-items: center; gap: 10px; }
 
     .button {
-      border: 1px solid color-mix(in oklab, var(--text) 22%, transparent);
+      border: 1px solid color-mix(in oklab, var(--text) 24%, transparent);
       border-radius: 999px;
-      background: color-mix(in oklab, var(--panel) 40%, var(--bg));
+      background: color-mix(in oklab, var(--accent) 14%, transparent);
       color: var(--text);
       font: 700 0.9rem/1 var(--font-family);
       letter-spacing: -0.01em;
@@ -86,55 +75,22 @@
       text-decoration: none;
     }
 
-    .button.save {
-      border-color: color-mix(in oklab, var(--accent) 65%, var(--text));
-      background: color-mix(in oklab, var(--accent) 18%, transparent);
-    }
-
-    .status {
-      margin: 0;
-      font-size: 0.82rem;
-      color: var(--muted);
-      min-width: 9ch;
-      text-align: right;
-    }
+    .status { margin: 0; font-size: 0.82rem; color: var(--muted); min-width: 9ch; text-align: right; }
 
     .gate,
-    .editor {
-      height: 100%;
-      width: 100%;
-    }
+    .editor { height: 100%; width: 100%; }
 
-    .gate {
-      display: grid;
-      place-items: center;
-      padding: clamp(18px, 4vw, 28px);
-    }
+    .gate { display: grid; place-items: center; padding: clamp(18px, 4vw, 28px); }
+    .gate-card { width: min(460px, 100%); display: grid; gap: 12px; }
 
-    .gate-card {
-      width: min(460px, 100%);
-      display: grid;
-      gap: 12px;
-    }
-
-    .gate-title {
-      margin: 0;
-      font-size: clamp(1.2rem, 2.8vw, 1.6rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .gate-subtitle {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
+    .gate-title { margin: 0; font-size: clamp(1.2rem, 2.8vw, 1.6rem); font-weight: 700; letter-spacing: -0.03em; }
+    .gate-subtitle { margin: 0; color: var(--muted); font-size: 0.95rem; }
 
     .gate-input {
       width: 100%;
       border-radius: 12px;
-      border: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
-      background: color-mix(in oklab, var(--panel) 86%, white);
+      border: 1px solid color-mix(in oklab, var(--text) 24%, transparent);
+      background: transparent;
       color: var(--text);
       font: 600 1rem/1.2 var(--font-family);
       padding: 0.78rem 0.95rem;
@@ -142,24 +98,22 @@
     }
 
     .gate-input:focus-visible {
-      border-color: color-mix(in oklab, var(--accent) 52%, var(--text));
+      border-color: color-mix(in oklab, var(--accent) 58%, var(--text));
       box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 24%, transparent);
     }
 
-    .gate-error {
-      min-height: 1.2em;
-      margin: 0;
-      color: #b91c1c;
-      font-size: 0.9rem;
-    }
+    .gate-error { min-height: 1.2em; margin: 0; color: #b91c1c; font-size: 0.9rem; }
+    .confirm-wrap { display: none; }
+    .confirm-wrap.visible { display: block; }
 
-    .editor {
-      display: none;
-      grid-template-rows: 1fr;
-    }
+    .editor { display: none; grid-template-rows: 1fr; padding: 14px; }
+    .editor.is-unlocked { display: grid; }
 
-    .editor.is-unlocked {
-      display: grid;
+    .editor-shell {
+      border: 1px solid color-mix(in oklab, var(--text) 26%, transparent);
+      border-radius: 14px;
+      background: transparent;
+      overflow: hidden;
     }
 
     textarea {
@@ -175,9 +129,7 @@
       caret-color: var(--accent);
     }
 
-    textarea::placeholder {
-      color: var(--muted);
-    }
+    textarea::placeholder { color: var(--muted); }
   </style>
 </head>
 <body>
@@ -185,7 +137,7 @@
     <header class="toolbar">
       <h1>froeller.com Notes</h1>
       <div class="toolbar-actions">
-        <button class="button save" id="saveButton" type="button" disabled>Save</button>
+        <button class="button" id="saveButton" type="button" disabled>Save</button>
         <a class="button" href="index.html" id="backLink">Back</a>
         <p class="status" id="status" aria-live="polite">Locked</p>
       </div>
@@ -193,26 +145,37 @@
 
     <section class="gate" id="gate">
       <form class="gate-card" id="gateForm">
-        <h2 class="gate-title">Enter password</h2>
-        <p class="gate-subtitle">Use your password to decrypt and open your notes.</p>
+        <h2 class="gate-title" id="gateTitle">Enter password</h2>
+        <p class="gate-subtitle" id="gateSubtitle">Use your password to decrypt and open your notes.</p>
         <input class="gate-input" id="passwordInput" type="password" placeholder="Password" autocomplete="current-password" required>
-        <button class="button save" type="submit">Unlock Notes</button>
+        <div class="confirm-wrap" id="confirmWrap">
+          <input class="gate-input" id="confirmInput" type="password" placeholder="Confirm password" autocomplete="new-password">
+        </div>
+        <button class="button" type="submit" id="unlockButton">Unlock Notes</button>
         <p class="gate-error" id="gateError" aria-live="polite"></p>
       </form>
     </section>
 
     <section class="editor" id="editor">
-      <textarea id="notesText" placeholder="Write your notes here..."></textarea>
+      <div class="editor-shell">
+        <textarea id="notesText" placeholder="Write your notes here..."></textarea>
+      </div>
     </section>
   </main>
 
   <script>
     (() => {
       const STORAGE_KEY = 'froellerSecureNotes.v1';
+      const AUTH_KEY = 'froellerSecureNotes.auth.v1';
       const TEXT_ENCODER = new TextEncoder();
       const TEXT_DECODER = new TextDecoder();
 
       const gateForm = document.getElementById('gateForm');
+      const gateTitle = document.getElementById('gateTitle');
+      const gateSubtitle = document.getElementById('gateSubtitle');
+      const confirmWrap = document.getElementById('confirmWrap');
+      const confirmInput = document.getElementById('confirmInput');
+      const unlockButton = document.getElementById('unlockButton');
       const backLink = document.getElementById('backLink');
       const passwordInput = document.getElementById('passwordInput');
       const gateError = document.getElementById('gateError');
@@ -222,12 +185,13 @@
       const saveButton = document.getElementById('saveButton');
       const status = document.getElementById('status');
 
-      if (!gateForm || !passwordInput || !gateError || !gate || !editor || !backLink || !notesText || !saveButton || !status) {
+      if (!gateForm || !gateTitle || !gateSubtitle || !confirmWrap || !confirmInput || !unlockButton || !passwordInput || !gateError || !gate || !editor || !backLink || !notesText || !saveButton || !status) {
         return;
       }
 
       let unlockedPassword = '';
       let autosaveTimer = null;
+      let setupMode = false;
 
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
@@ -245,49 +209,36 @@
           if (!raw) return;
           const parsed = JSON.parse(raw);
           if (!parsed || typeof parsed !== 'object') return;
-
-          if (parsed.pageBg) {
-            document.documentElement.style.setProperty('--bg', parsed.pageBg);
-          }
+          if (parsed.pageBg) document.documentElement.style.setProperty('--bg', parsed.pageBg);
           if (parsed.pageText) {
             document.documentElement.style.setProperty('--text', parsed.pageText);
-            const muted = parsed.pageText === '#000000' ? '#334155' : '#e5e7eb';
-            document.documentElement.style.setProperty('--muted', muted);
+            document.documentElement.style.setProperty('--muted', parsed.pageText === '#000000' ? '#334155' : '#e5e7eb');
           }
-          if (parsed.logoColor) {
-            document.documentElement.style.setProperty('--accent', parsed.logoColor);
-          }
-          document.documentElement.style.setProperty('--panel', 'color-mix(in oklab, #ffffff 88%, var(--bg))');
+          if (parsed.logoColor) document.documentElement.style.setProperty('--accent', parsed.logoColor);
         } catch (error) {
           console.debug('Theme load unavailable', error);
         }
       }
 
-      function toBase64(bytes) {
-        return window.btoa(String.fromCharCode(...new Uint8Array(bytes)));
-      }
-
+      function toBase64(bytes) { return window.btoa(String.fromCharCode(...new Uint8Array(bytes))); }
       function fromBase64(value) {
         const ascii = window.atob(value);
         return Uint8Array.from(ascii, (char) => char.charCodeAt(0));
       }
 
-      async function deriveKey(password, saltBytes) {
-        const keyMaterial = await window.crypto.subtle.importKey(
-          'raw',
-          TEXT_ENCODER.encode(password),
-          'PBKDF2',
-          false,
-          ['deriveKey']
-        );
+      function readJson(key) {
+        try {
+          const raw = window.localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      }
 
+      async function deriveAesKey(password, saltBytes) {
+        const keyMaterial = await window.crypto.subtle.importKey('raw', TEXT_ENCODER.encode(password), 'PBKDF2', false, ['deriveKey']);
         return window.crypto.subtle.deriveKey(
-          {
-            name: 'PBKDF2',
-            salt: saltBytes,
-            iterations: 250000,
-            hash: 'SHA-256'
-          },
+          { name: 'PBKDF2', salt: saltBytes, iterations: 250000, hash: 'SHA-256' },
           keyMaterial,
           { name: 'AES-GCM', length: 256 },
           false,
@@ -295,46 +246,47 @@
         );
       }
 
+      async function hashPassword(password, saltBytes) {
+        const keyMaterial = await window.crypto.subtle.importKey('raw', TEXT_ENCODER.encode(password), 'PBKDF2', false, ['deriveBits']);
+        const bits = await window.crypto.subtle.deriveBits(
+          { name: 'PBKDF2', salt: saltBytes, iterations: 250000, hash: 'SHA-256' },
+          keyMaterial,
+          256
+        );
+        return toBase64(new Uint8Array(bits));
+      }
+
       async function encryptText(plainText, password) {
         const salt = window.crypto.getRandomValues(new Uint8Array(16));
         const iv = window.crypto.getRandomValues(new Uint8Array(12));
-        const key = await deriveKey(password, salt);
-        const cipherBuffer = await window.crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv },
-          key,
-          TEXT_ENCODER.encode(plainText)
-        );
-
-        return {
-          salt: toBase64(salt),
-          iv: toBase64(iv),
-          cipher: toBase64(new Uint8Array(cipherBuffer)),
-          savedAt: new Date().toISOString()
-        };
+        const key = await deriveAesKey(password, salt);
+        const cipherBuffer = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, TEXT_ENCODER.encode(plainText));
+        return { salt: toBase64(salt), iv: toBase64(iv), cipher: toBase64(new Uint8Array(cipherBuffer)), savedAt: new Date().toISOString() };
       }
 
       async function decryptPayload(payload, password) {
         const salt = fromBase64(payload.salt);
         const iv = fromBase64(payload.iv);
         const cipher = fromBase64(payload.cipher);
-        const key = await deriveKey(password, salt);
-
-        const plainBuffer = await window.crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
-          key,
-          cipher
-        );
-
+        const key = await deriveAesKey(password, salt);
+        const plainBuffer = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
         return TEXT_DECODER.decode(plainBuffer);
       }
 
-      function loadEncryptedPayload() {
-        try {
-          const raw = window.localStorage.getItem(STORAGE_KEY);
-          return raw ? JSON.parse(raw) : null;
-        } catch (error) {
-          return null;
-        }
+      async function verifyPassword(password) {
+        const auth = readJson(AUTH_KEY);
+        if (!auth || !auth.salt || !auth.hash) return false;
+        const salt = fromBase64(auth.salt);
+        const attemptHash = await hashPassword(password, salt);
+        return attemptHash === auth.hash;
+      }
+
+      async function setupPassword(password) {
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const hash = await hashPassword(password, salt);
+        window.localStorage.setItem(AUTH_KEY, JSON.stringify({ salt: toBase64(salt), hash }));
+        const emptyPayload = await encryptText('', password);
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(emptyPayload));
       }
 
       async function saveNow() {
@@ -342,9 +294,7 @@
           status.textContent = 'Locked';
           return;
         }
-
         status.textContent = 'Saving...';
-
         try {
           const payload = await encryptText(notesText.value, unlockedPassword);
           window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -356,59 +306,69 @@
       }
 
       function queueAutosave() {
-        if (!unlockedPassword) {
-          return;
-        }
-
+        if (!unlockedPassword) return;
         status.textContent = 'Unsaved changes';
-        if (autosaveTimer) {
-          window.clearTimeout(autosaveTimer);
-        }
-
-        autosaveTimer = window.setTimeout(() => {
-          saveNow();
-        }, 700);
+        if (autosaveTimer) window.clearTimeout(autosaveTimer);
+        autosaveTimer = window.setTimeout(() => { saveNow(); }, 700);
       }
 
-      async function unlock(password) {
-        const existingPayload = loadEncryptedPayload();
-        if (!existingPayload) {
-          unlockedPassword = password;
-          notesText.value = '';
-          return;
+      function setModeFromStorage() {
+        const hasAuth = !!readJson(AUTH_KEY);
+        setupMode = !hasAuth;
+        if (setupMode) {
+          gateTitle.textContent = 'Create password';
+          gateSubtitle.textContent = 'First visit: create a password. The password itself is never stored.';
+          unlockButton.textContent = 'Create & Unlock';
+          confirmWrap.classList.add('visible');
+          passwordInput.autocomplete = 'new-password';
+          confirmInput.required = true;
         }
-
-        const plainText = await decryptPayload(existingPayload, password);
-        unlockedPassword = password;
-        notesText.value = plainText;
       }
 
       applyStoredTheme();
+      setModeFromStorage();
       backLink.href = resolvePageUrl('index.html');
 
       gateForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         gateError.textContent = '';
+        const password = passwordInput.value;
 
         try {
-          await unlock(passwordInput.value);
+          if (setupMode) {
+            if (password.length < 6) {
+              gateError.textContent = 'Please use at least 6 characters.';
+              return;
+            }
+            if (password !== confirmInput.value) {
+              gateError.textContent = 'Passwords do not match.';
+              return;
+            }
+            await setupPassword(password);
+          } else {
+            const ok = await verifyPassword(password);
+            if (!ok) {
+              gateError.textContent = 'Wrong password.';
+              return;
+            }
+          }
+
+          const payload = readJson(STORAGE_KEY);
+          unlockedPassword = password;
+          notesText.value = payload ? await decryptPayload(payload, password) : '';
+
           gate.style.display = 'none';
           editor.classList.add('is-unlocked');
           saveButton.disabled = false;
           status.textContent = 'Unlocked';
           notesText.focus();
         } catch (error) {
-          gateError.textContent = 'Wrong password or corrupted encrypted data.';
+          gateError.textContent = 'Could not unlock encrypted notes.';
         }
       });
 
-      saveButton.addEventListener('click', () => {
-        saveNow();
-      });
-
-      notesText.addEventListener('input', () => {
-        queueAutosave();
-      });
+      saveButton.addEventListener('click', () => { saveNow(); });
+      notesText.addEventListener('input', () => { queueAutosave(); });
     })();
   </script>
 </body>
