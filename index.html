@@ -10,7 +10,7 @@
   <meta name="referrer" content="no-referrer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --page-bg: #efefef;
@@ -18,8 +18,8 @@
       --logo-color: #ffffff;
       --logo-size: clamp(104px, 12.4vmin, 156px);
       --gap: clamp(14px, 2.2vmin, 24px);
-      --font-family: 'Sora', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      --move-left: clamp(-92px, -9.5vw, -128px);
+      --font-family: 'Poppins', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --move-left: 0px;
     }
 
     * { box-sizing: border-box; }
@@ -55,7 +55,7 @@
       justify-content: center;
       gap: var(--gap);
       transform: translateX(0);
-      animation: slideToLeft 1350ms cubic-bezier(0.2, 0.85, 0.2, 1) 2300ms forwards;
+      animation: slideToLeft 1150ms cubic-bezier(0.2, 0.85, 0.2, 1) 2300ms forwards;
       will-change: transform;
     }
 
@@ -137,7 +137,7 @@
       margin: 0;
       color: color-mix(in oklab, var(--logo-color) 78%, transparent);
       font-size: clamp(0.82rem, 1.4vmin, 1rem);
-      font-style: italic;
+      font-style: normal;
       letter-spacing: -0.01em;
       pointer-events: none;
       white-space: nowrap;
@@ -182,10 +182,6 @@
     }
 
     @media (max-width: 720px) {
-      :root {
-        --move-left: clamp(-56px, -9vw, -88px);
-      }
-
       .wordmark { font-size: clamp(1.72rem, 11.2vw, 3rem); }
       .logo { width: clamp(80px, 25vw, 112px); }
       .brand-row { gap: clamp(10px, 3vw, 18px); }
@@ -202,6 +198,7 @@
       }
 
       .login-button { pointer-events: auto; }
+      .wordmark { max-width: 16ch; }
     }
   </style>
 </head>
@@ -402,6 +399,24 @@
         });
       }
 
+      function setBrandTargetOffset() {
+        const brandRow = document.querySelector('.brand-row');
+        const logo = document.querySelector('.logo');
+        const wordmark = document.querySelector('.wordmark');
+        if (!brandRow || !logo || !wordmark) {
+          return;
+        }
+
+        const logoWidth = logo.getBoundingClientRect().width;
+        const originalMaxWidth = wordmark.style.maxWidth;
+        wordmark.style.maxWidth = '16ch';
+        const wordmarkWidth = wordmark.scrollWidth;
+        wordmark.style.maxWidth = originalMaxWidth;
+
+        const offset = -Math.max(0, (wordmarkWidth - logoWidth) / 2);
+        document.documentElement.style.setProperty('--move-left', `${Math.round(offset)}px`);
+      }
+
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
         if (currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) {
@@ -414,6 +429,7 @@
 
       applyAccessibleRandomBackground();
       renderWordmark();
+      setBrandTargetOffset();
       enableLogoDialInteraction();
 
       const yearNode = document.getElementById('copyrightYear');
@@ -435,8 +451,7 @@
         }
 
         let activePointerId = null;
-        let baseAngle = 0;
-        let dragStartAngle = 0;
+        let lastPointerAngle = 0;
         let currentRotation = 0;
         let springBackFrame = null;
         let springVelocity = 0;
@@ -486,8 +501,7 @@
           activePointerId = event.pointerId;
           logo.setPointerCapture(activePointerId);
           logo.classList.add('rotating');
-          baseAngle = angleFromPointer(event);
-          dragStartAngle = currentRotation;
+          lastPointerAngle = angleFromPointer(event);
           springVelocity = 0;
           event.preventDefault();
         });
@@ -498,8 +512,9 @@
           }
 
           const pointerAngle = angleFromPointer(event);
-          const delta = normalizeAngle(pointerAngle - baseAngle);
-          const next = dragStartAngle + delta;
+          const delta = normalizeAngle(pointerAngle - lastPointerAngle);
+          lastPointerAngle = pointerAngle;
+          const next = currentRotation + delta;
           setRotation(Math.max(-160, Math.min(160, next)));
         });
 
