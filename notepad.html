@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>froeller.com — Notepad</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a20;
+      --text: #f4f6f8;
+      --muted: #9ca3af;
+      --accent: #7dd3fc;
+      --font-family: 'Manrope', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(circle at top right, #1d2230, var(--bg) 58%);
+      color: var(--text);
+      font-family: var(--font-family);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: clamp(16px, 4vw, 32px);
+    }
+
+    .notepad {
+      width: min(920px, 100%);
+      height: min(680px, 100%);
+      background: color-mix(in oklab, var(--panel) 88%, black);
+      border: 1px solid color-mix(in oklab, white 12%, transparent);
+      border-radius: 22px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid color-mix(in oklab, white 10%, transparent);
+      background: color-mix(in oklab, var(--panel) 72%, black);
+    }
+
+    .toolbar h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .toolbar a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      font: 500 1.02rem/1.6 var(--font-family);
+      padding: clamp(16px, 2.8vw, 28px);
+      caret-color: var(--accent);
+    }
+
+    textarea::placeholder {
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="notepad" aria-label="Notepad">
+    <header class="toolbar">
+      <h1>froeller.com Notepad</h1>
+      <a href="index.html">Zurück</a>
+    </header>
+    <textarea placeholder="Schreibe hier deine Notizen …"></textarea>
+  </main>
+</body>
+</html>
