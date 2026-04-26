@@ -7,15 +7,15 @@
   <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f1115;
-      --panel: #171a20;
-      --text: #f4f6f8;
-      --muted: #9ca3af;
-      --accent: #7dd3fc;
-      --font-family: 'Sora', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --bg: #efefef;
+      --panel: #ffffff;
+      --text: #111111;
+      --muted: #4b5563;
+      --accent: #2563eb;
+      --font-family: 'Poppins', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -25,7 +25,7 @@
       width: 100%;
       height: 100%;
       margin: 0;
-      background: radial-gradient(circle at top right, #1d2230, var(--bg) 58%);
+      background: var(--bg);
       color: var(--text);
       font-family: var(--font-family);
     }
@@ -39,10 +39,10 @@
     .notepad {
       width: min(920px, 100%);
       height: min(680px, 100%);
-      background: color-mix(in oklab, var(--panel) 88%, black);
-      border: 1px solid color-mix(in oklab, white 12%, transparent);
+      background: color-mix(in oklab, var(--panel) 96%, white);
+      border: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
       border-radius: 22px;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 20px 80px color-mix(in oklab, var(--text) 25%, transparent);
       display: grid;
       grid-template-rows: auto 1fr;
       overflow: hidden;
@@ -54,23 +54,21 @@
       justify-content: space-between;
       gap: 12px;
       padding: 14px 18px;
-      border-bottom: 1px solid color-mix(in oklab, white 10%, transparent);
-      background: color-mix(in oklab, var(--panel) 72%, black);
+      border-bottom: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      background: color-mix(in oklab, var(--panel) 84%, var(--bg));
     }
 
     .toolbar h1 {
       margin: 0;
       font-size: 1rem;
       font-weight: 800;
-      font-style: italic;
       letter-spacing: -0.02em;
     }
 
     .toolbar a {
       color: var(--accent);
       text-decoration: none;
-      font-weight: 500;
-      font-style: italic;
+      font-weight: 600;
       font-size: 0.95rem;
     }
 
@@ -96,7 +94,6 @@
       margin: 0;
       font-size: clamp(1.2rem, 2.8vw, 1.6rem);
       font-weight: 700;
-      font-style: italic;
       letter-spacing: -0.03em;
     }
 
@@ -109,8 +106,8 @@
     .gate-input {
       width: 100%;
       border-radius: 12px;
-      border: 1px solid color-mix(in oklab, white 14%, transparent);
-      background: color-mix(in oklab, var(--panel) 84%, black);
+      border: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
+      background: color-mix(in oklab, var(--panel) 86%, white);
       color: var(--text);
       font: 500 1rem/1.2 var(--font-family);
       padding: 0.78rem 0.95rem;
@@ -128,7 +125,7 @@
       border-radius: 999px;
       background: color-mix(in oklab, var(--accent) 16%, transparent);
       color: var(--text);
-      font: italic 600 0.96rem/1 var(--font-family);
+      font: 600 0.96rem/1 var(--font-family);
       letter-spacing: -0.01em;
       padding: 0.72rem 1.3rem;
       cursor: pointer;
@@ -137,7 +134,7 @@
     .gate-error {
       min-height: 1.2em;
       margin: 0;
-      color: #fca5a5;
+      color: #b91c1c;
       font-size: 0.9rem;
     }
 
@@ -191,7 +188,7 @@
 
   <script>
     (() => {
-      const EXPECTED_PASSWORD = 'froeller';
+      const EXPECTED_PASSWORD = 'test';
 
       const gateForm = document.getElementById('gateForm');
       const backLink = document.getElementById('backLink');
@@ -204,6 +201,42 @@
         return;
       }
 
+      function randomChannel() {
+        return Math.floor(Math.random() * 256);
+      }
+
+      function luminance(r, g, b) {
+        const toLinear = (value) => {
+          const normalized = value / 255;
+          return normalized <= 0.04045
+            ? normalized / 12.92
+            : Math.pow((normalized + 0.055) / 1.055, 2.4);
+        };
+
+        return toLinear(r) * 0.2126 + toLinear(g) * 0.7152 + toLinear(b) * 0.0722;
+      }
+
+      function applyRandomTheme() {
+        const bg = { r: randomChannel(), g: randomChannel(), b: randomChannel() };
+        const accent = {
+          r: (bg.r + 110) % 255,
+          g: (bg.g + 170) % 255,
+          b: (bg.b + 210) % 255
+        };
+
+        const bgCss = `rgb(${bg.r} ${bg.g} ${bg.b})`;
+        const accentCss = `rgb(${accent.r} ${accent.g} ${accent.b})`;
+        const text = luminance(bg.r, bg.g, bg.b) > 0.45 ? '#111111' : '#ffffff';
+        const muted = text === '#111111' ? '#334155' : '#e5e7eb';
+        const panel = text === '#111111' ? 'rgba(255, 255, 255, 0.82)' : 'rgba(15, 23, 42, 0.74)';
+
+        document.documentElement.style.setProperty('--bg', bgCss);
+        document.documentElement.style.setProperty('--text', text);
+        document.documentElement.style.setProperty('--muted', muted);
+        document.documentElement.style.setProperty('--panel', panel);
+        document.documentElement.style.setProperty('--accent', accentCss);
+      }
+
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
         if (currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) {
@@ -214,6 +247,7 @@
         return fileName;
       }
 
+      applyRandomTheme();
       backLink.href = resolvePageUrl('index.html');
 
       gateForm.addEventListener('submit', (event) => {
@@ -222,6 +256,7 @@
         if (passwordInput.value === EXPECTED_PASSWORD) {
           gate.style.display = 'none';
           editor.classList.add('is-unlocked');
+          gateError.textContent = '';
           return;
         }
 
