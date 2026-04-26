@@ -10,20 +10,19 @@
   <meta name="referrer" content="no-referrer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,700;1,500;1,800&display=swap" rel="stylesheet">
   <style>
     :root {
       --page-bg: #efefef;
       --page-text: #111111;
       --logo-color: #ffffff;
-      --logo-size: clamp(112px, 14vmin, 172px);
-      --gap: clamp(14px, 2.4vmin, 24px);
-      --font-family: 'Manrope', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --logo-size: clamp(116px, 14vmin, 176px);
+      --gap: clamp(14px, 2.2vmin, 24px);
+      --font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --move-left: clamp(-92px, -9.5vw, -128px);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html,
     body {
@@ -32,23 +31,22 @@
       margin: 0;
       overflow: hidden;
       background: var(--page-bg);
-      color: var(--page-text);
       font-family: var(--font-family);
     }
 
     body {
       display: grid;
       place-items: center;
+      color: var(--logo-color);
     }
 
     .hero {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: clamp(24px, 4.2vmin, 38px);
-      transform: translateY(0);
-      opacity: 0;
-      animation: heroAppear 2000ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      justify-content: center;
+      gap: clamp(26px, 4.2vmin, 40px);
+      width: min(90vw, 980px);
     }
 
     .brand-row {
@@ -56,14 +54,17 @@
       align-items: center;
       justify-content: center;
       gap: var(--gap);
-      transform: translateX(28px);
-      animation: brandSettle 1000ms cubic-bezier(0.2, 0.9, 0.25, 1) 2000ms forwards;
+      transform: translateX(0);
+      animation: slideToLeft 1350ms cubic-bezier(0.2, 0.85, 0.2, 1) 2300ms forwards;
+      will-change: transform;
     }
 
     .logo {
       width: var(--logo-size);
       aspect-ratio: 1 / 1;
       background: var(--logo-color);
+      opacity: 0;
+      animation: logoFadeIn 2200ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
       -webkit-mask-image: url('logo.svg');
       -webkit-mask-repeat: no-repeat;
       -webkit-mask-position: center;
@@ -77,36 +78,42 @@
 
     .wordmark {
       margin: 0;
-      font-size: clamp(2.1rem, 5.2vmin, 4.8rem);
+      min-height: 1em;
+      font-size: clamp(2.15rem, 5.2vmin, 4.9rem);
       font-weight: 800;
-      letter-spacing: -0.03em;
+      font-style: italic;
+      letter-spacing: -0.045em;
       line-height: 0.9;
-      opacity: 0;
-      transform: translateX(20px);
-      animation: wordmarkEnter 850ms cubic-bezier(0.16, 1, 0.3, 1) 2400ms forwards;
+      color: var(--logo-color);
       white-space: nowrap;
     }
 
-    .login-button {
-      border: 0;
-      border-radius: 999px;
-      padding: 0.8rem 1.9rem;
-      font: inherit;
-      font-size: clamp(0.95rem, 1.7vmin, 1.1rem);
-      font-weight: 500;
-      letter-spacing: 0.01em;
-      background: color-mix(in oklab, var(--page-text) 12%, #ffffff);
-      color: var(--page-text);
-      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.16);
+    .char {
+      display: inline-block;
       opacity: 0;
-      transform: translateY(20px) scale(0.96);
+      transform: translateY(10px);
+      animation: charIn 420ms cubic-bezier(0.2, 0.95, 0.3, 1) forwards;
+      animation-delay: calc(2480ms + (var(--i) * 88ms));
+    }
+
+    .login-button {
+      border: 1.5px solid color-mix(in oklab, var(--logo-color) 70%, transparent);
+      border-radius: 999px;
+      padding: 0.78rem 2rem;
+      font: italic 600 clamp(0.96rem, 1.7vmin, 1.1rem) / 1 var(--font-family);
+      letter-spacing: -0.01em;
+      background: color-mix(in oklab, var(--logo-color) 10%, transparent);
+      color: var(--logo-color);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
       pointer-events: none;
       cursor: pointer;
-      animation: buttonEnter 650ms cubic-bezier(0.16, 1, 0.3, 1) 3550ms forwards;
+      animation: buttonEnter 700ms cubic-bezier(0.16, 1, 0.3, 1) 4050ms forwards;
     }
 
     .login-button:focus-visible {
-      outline: 3px solid color-mix(in oklab, var(--logo-color) 60%, white);
+      outline: 3px solid color-mix(in oklab, var(--logo-color) 70%, white);
       outline-offset: 3px;
     }
 
@@ -116,49 +123,39 @@
       bottom: clamp(12px, 2.2vmin, 24px);
       transform: translateX(-50%);
       margin: 0;
-      color: color-mix(in oklab, var(--page-text) 76%, white);
+      color: color-mix(in oklab, var(--logo-color) 78%, transparent);
       font-size: clamp(0.82rem, 1.4vmin, 1rem);
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      line-height: 1.2;
-      text-align: center;
+      font-style: italic;
+      letter-spacing: -0.01em;
       pointer-events: none;
       white-space: nowrap;
     }
 
-    @keyframes heroAppear {
+    @keyframes logoFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideToLeft {
+      from { transform: translateX(0); }
+      to { transform: translateX(var(--move-left)); }
+    }
+
+    @keyframes charIn {
       from {
         opacity: 0;
+        transform: translateY(10px);
       }
       to {
         opacity: 1;
-      }
-    }
-
-    @keyframes brandSettle {
-      0% {
-        transform: translateX(28px) translateY(0);
-      }
-      100% {
-        transform: translateX(0) translateY(-26px);
-      }
-    }
-
-    @keyframes wordmarkEnter {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
+        transform: translateY(0);
       }
     }
 
     @keyframes buttonEnter {
       from {
         opacity: 0;
-        transform: translateY(20px) scale(0.96);
+        transform: translateY(16px) scale(0.97);
       }
       to {
         opacity: 1;
@@ -167,33 +164,27 @@
       }
     }
 
-    @media (max-width: 680px) {
-      .wordmark {
-        font-size: clamp(1.75rem, 10vw, 3rem);
+    @media (max-width: 720px) {
+      :root {
+        --move-left: clamp(-56px, -9vw, -88px);
       }
 
-      .logo {
-        width: clamp(88px, 27vw, 124px);
-      }
-
-      .brand-row {
-        gap: clamp(10px, 3.2vw, 18px);
-      }
+      .wordmark { font-size: clamp(1.72rem, 11.2vw, 3rem); }
+      .logo { width: clamp(88px, 28vw, 126px); }
+      .brand-row { gap: clamp(10px, 3vw, 18px); }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .hero,
+      .logo,
       .brand-row,
-      .wordmark,
+      .char,
       .login-button {
         animation: none;
         opacity: 1;
         transform: none;
       }
 
-      .login-button {
-        pointer-events: auto;
-      }
+      .login-button { pointer-events: auto; }
     }
   </style>
 </head>
@@ -201,7 +192,7 @@
   <main class="hero" aria-label="Logo und Einstieg">
     <div class="brand-row">
       <div class="logo" role="img" aria-label="froeller.com Logo"></div>
-      <h1 class="wordmark">froeller.com</h1>
+      <h1 class="wordmark" id="wordmark" aria-label="froeller.com"></h1>
     </div>
     <button class="login-button" id="loginButton" type="button">Login</button>
   </main>
@@ -376,7 +367,26 @@
         document.documentElement.style.setProperty('--logo-color', pickLogoColorForBackground(background));
       }
 
+      function renderWordmark() {
+        const wordmark = document.getElementById('wordmark');
+        if (!wordmark) {
+          return;
+        }
+
+        const text = 'froeller.com';
+        wordmark.textContent = '';
+
+        [...text].forEach((character, index) => {
+          const span = document.createElement('span');
+          span.className = 'char';
+          span.style.setProperty('--i', String(index));
+          span.textContent = character;
+          wordmark.appendChild(span);
+        });
+      }
+
       applyAccessibleRandomBackground();
+      renderWordmark();
 
       const yearNode = document.getElementById('copyrightYear');
       if (yearNode) {
