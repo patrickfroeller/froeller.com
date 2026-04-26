@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>froeller.com</title>
   <link rel="icon" type="image/svg+xml" href="logo.svg">
-  <meta name="description" content="Animierter Einstieg mit Logo, Schriftzug und Login.">
+  <meta name="description" content="Animated entry screen with logo, wordmark, and login.">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <meta name="referrer" content="no-referrer">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --page-bg: #efefef;
@@ -18,8 +18,7 @@
       --logo-color: #ffffff;
       --logo-size: clamp(104px, 12.4vmin, 156px);
       --gap: clamp(14px, 2.2vmin, 24px);
-      --font-family: 'Poppins', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      --move-left: 0px;
+      --font-family: 'Nunito Sans', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -55,7 +54,7 @@
       justify-content: center;
       gap: var(--gap);
       transform: translateX(0);
-      animation: slideToLeft 1150ms cubic-bezier(0.2, 0.85, 0.2, 1) 2300ms forwards;
+      animation: none;
       will-change: transform;
     }
 
@@ -95,9 +94,6 @@
       line-height: 0.9;
       color: var(--logo-color);
       white-space: nowrap;
-      max-width: 0;
-      overflow: hidden;
-      animation: revealWordmark 1ms linear 2480ms forwards;
     }
 
     .char {
@@ -148,11 +144,6 @@
       to { opacity: 1; }
     }
 
-    @keyframes slideToLeft {
-      from { transform: translateX(0); }
-      to { transform: translateX(var(--move-left)); }
-    }
-
     @keyframes charIn {
       from {
         opacity: 0;
@@ -162,11 +153,6 @@
         opacity: 1;
         transform: translateY(0);
       }
-    }
-
-    @keyframes revealWordmark {
-      from { max-width: 0; }
-      to { max-width: 16ch; }
     }
 
     @keyframes buttonEnter {
@@ -198,17 +184,16 @@
       }
 
       .login-button { pointer-events: auto; }
-      .wordmark { max-width: 16ch; }
     }
   </style>
 </head>
 <body>
-  <main class="hero" aria-label="Logo und Einstieg">
+  <main class="hero" aria-label="Logo and entry">
     <div class="brand-row">
       <div class="logo" role="img" aria-label="froeller.com Logo"></div>
       <h1 class="wordmark" id="wordmark" aria-label="froeller.com"></h1>
     </div>
-    <button class="login-button" id="loginButton" type="button">Login</button>
+    <button class="login-button" id="loginButton" type="button">Open Notes</button>
   </main>
 
   <p class="site-footer">© <span id="copyrightYear"></span> Patrick Fröller. All rights reserved.</p>
@@ -378,7 +363,20 @@
 
         document.documentElement.style.setProperty('--page-bg', bgCss);
         document.documentElement.style.setProperty('--page-text', textColor);
-        document.documentElement.style.setProperty('--logo-color', pickLogoColorForBackground(background));
+        const logoColor = pickLogoColorForBackground(background);
+        document.documentElement.style.setProperty('--logo-color', logoColor);
+
+        const themeState = {
+          pageBg: bgCss,
+          pageText: textColor,
+          logoColor
+        };
+
+        try {
+          window.localStorage.setItem('froellerTheme', JSON.stringify(themeState));
+        } catch (error) {
+          console.debug('Theme persistence unavailable', error);
+        }
       }
 
       function renderWordmark() {
@@ -399,23 +397,6 @@
         });
       }
 
-      function setBrandTargetOffset() {
-        const brandRow = document.querySelector('.brand-row');
-        const logo = document.querySelector('.logo');
-        const wordmark = document.querySelector('.wordmark');
-        if (!brandRow || !logo || !wordmark) {
-          return;
-        }
-
-        const logoWidth = logo.getBoundingClientRect().width;
-        const originalMaxWidth = wordmark.style.maxWidth;
-        wordmark.style.maxWidth = '16ch';
-        const wordmarkWidth = wordmark.scrollWidth;
-        wordmark.style.maxWidth = originalMaxWidth;
-
-        const offset = -Math.max(0, (wordmarkWidth - logoWidth) / 2);
-        document.documentElement.style.setProperty('--move-left', `${Math.round(offset)}px`);
-      }
 
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
@@ -429,7 +410,6 @@
 
       applyAccessibleRandomBackground();
       renderWordmark();
-      setBrandTargetOffset();
       enableLogoDialInteraction();
 
       const yearNode = document.getElementById('copyrightYear');
@@ -440,7 +420,7 @@
       const loginButton = document.getElementById('loginButton');
       if (loginButton) {
         loginButton.addEventListener('click', () => {
-          window.location.href = resolvePageUrl('notepad.html');
+          window.location.href = resolvePageUrl('notes.html');
         });
       }
 
