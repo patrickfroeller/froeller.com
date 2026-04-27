@@ -302,10 +302,8 @@
         const logoCenterX = parentBounds.left + logoShell.offsetLeft + shellWidth / 2;
         const logoCenterY = parentBounds.top + logoShell.offsetTop + shellHeight / 2;
         const viewportCenterX = window.innerWidth / 2;
-        const viewportCenterY = window.innerHeight / 2;
-
         document.documentElement.style.setProperty('--logo-start-shift-x', `${viewportCenterX - logoCenterX}px`);
-        document.documentElement.style.setProperty('--logo-start-shift-y', `${viewportCenterY - logoCenterY}px`);
+        document.documentElement.style.setProperty('--logo-start-shift-y', '0px');
       }
 
       function syncSlideTargetForInitialLayout() {
