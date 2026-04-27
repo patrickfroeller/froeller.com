@@ -104,7 +104,14 @@
     .editor { display: none; grid-template-rows: 1fr; min-height: 0; }
     .editor.is-unlocked { display: grid; }
 
-    .editor-shell { background: transparent; overflow: hidden; min-height: 0; }
+    .editor-shell {
+      background: transparent;
+      overflow: hidden;
+      min-height: 0;
+      border: 1.5px solid color-mix(in oklab, var(--brand-fg) 50%, transparent);
+      border-radius: 18px;
+      padding: clamp(8px, 1.6vw, 14px);
+    }
 
     textarea {
       width: 100%;
@@ -115,7 +122,7 @@
       background: transparent;
       color: var(--brand-fg);
       font: 600 1.02rem/1.6 var(--font-family);
-      padding: clamp(8px, 1.8vw, 16px) 0 0;
+      padding: 0;
       caret-color: var(--accent);
     }
 
