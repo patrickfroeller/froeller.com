@@ -60,7 +60,9 @@
 
     .logo-shell {
       flex: 0 0 auto;
-      transform: translateX(0);
+      transform: translateX(var(--logo-start-shift));
+      will-change: transform;
+      animation: logoCenterToBrand 1500ms cubic-bezier(0.19, 1, 0.22, 1) 2200ms forwards;
     }
 
     .logo {
@@ -128,6 +130,10 @@
     }
 
     @keyframes logoFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes logoCenterToBrand {
+      from { transform: translateX(var(--logo-start-shift)); }
+      to { transform: translateX(0); }
+    }
     @keyframes buttonFadeIn {
       from { opacity: 0; }
       to { opacity: 1; pointer-events: auto; }
