@@ -99,6 +99,19 @@
       box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand-fg) 24%, transparent);
     }
 
+    .gate-input.shake {
+      animation: shakeNo 420ms ease;
+    }
+
+    @keyframes shakeNo {
+      0%, 100% { transform: translateX(0); }
+      18% { transform: translateX(-9px); }
+      36% { transform: translateX(9px); }
+      54% { transform: translateX(-7px); }
+      72% { transform: translateX(7px); }
+      86% { transform: translateX(-4px); }
+    }
+
     .gate-error { min-height: 1.2em; margin: 0; color: #b91c1c; font-size: 0.9rem; justify-self: start; }
     .confirm-wrap { display: none; }
     .confirm-wrap.visible { display: block; width: 100%; }
@@ -338,6 +351,14 @@
         }
       }
 
+      function shakeAndClearInput(inputField) {
+        inputField.classList.remove('shake');
+        void inputField.offsetWidth;
+        inputField.classList.add('shake');
+        inputField.value = '';
+        inputField.focus();
+      }
+
       normalizeFaviconForPreview();
       applyStoredTheme();
       setModeFromStorage();
@@ -362,7 +383,7 @@
           } else {
             const ok = await verifyPassword(password);
             if (!ok) {
-              gateError.textContent = 'Wrong password.';
+              shakeAndClearInput(passwordInput);
               return;
             }
           }
