@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>froeller.com</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <meta name="description" content="Animated entry screen with logo, wordmark, and login.">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <meta name="referrer" content="no-referrer">
@@ -19,7 +21,7 @@
       --logo-size: clamp(104px, 12.4vmin, 156px);
       --gap: clamp(14px, 2.2vmin, 24px);
       --font-family: 'Quicksand', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      --logo-start-shift: 100px;
+      --logo-start-shift: 0px;
     }
 
     * { box-sizing: border-box; }
@@ -252,13 +254,18 @@
 
       function setSlideTarget() {
         const brandRow = document.getElementById('brandRow');
+        const hero = document.querySelector('.hero');
         const logo = document.querySelector('.logo');
         const wordmark = document.getElementById('wordmark');
-        if (!brandRow || !logo || !wordmark) return;
+        if (!brandRow || !hero || !logo || !wordmark) return;
 
         const wordmarkWidth = wordmark.getBoundingClientRect().width;
         const gap = parseFloat(getComputedStyle(brandRow).columnGap || getComputedStyle(brandRow).gap || '0') || 0;
-        const offset = Math.max(0, (wordmarkWidth + gap) / 2);
+        const requestedOffset = Math.max(0, (wordmarkWidth + gap) / 2);
+        const heroWidth = hero.getBoundingClientRect().width;
+        const logoWidth = logo.getBoundingClientRect().width;
+        const maxSafeOffset = Math.max(0, (heroWidth - logoWidth) / 2);
+        const offset = Math.min(requestedOffset, maxSafeOffset);
         document.documentElement.style.setProperty('--logo-start-shift', `${Math.round(offset)}px`);
       }
 
@@ -343,6 +350,9 @@
 
       applyAccessibleRandomBackground();
       setSlideTarget();
+      if (document.fonts?.ready) {
+        document.fonts.ready.then(() => { setSlideTarget(); });
+      }
       enableLogoDialInteraction();
 
       const yearNode = document.getElementById('copyrightYear');
