@@ -250,13 +250,18 @@
 
       function setSlideTarget() {
         const brandRow = document.getElementById('brandRow');
+        const hero = document.querySelector('.hero');
         const logo = document.querySelector('.logo');
         const wordmark = document.getElementById('wordmark');
-        if (!brandRow || !logo || !wordmark) return;
+        if (!brandRow || !hero || !logo || !wordmark) return;
 
         const wordmarkWidth = wordmark.getBoundingClientRect().width;
         const gap = parseFloat(getComputedStyle(brandRow).columnGap || getComputedStyle(brandRow).gap || '0') || 0;
-        const offset = Math.max(0, (wordmarkWidth + gap) / 2);
+        const requestedOffset = Math.max(0, (wordmarkWidth + gap) / 2);
+        const heroWidth = hero.getBoundingClientRect().width;
+        const logoWidth = logo.getBoundingClientRect().width;
+        const maxSafeOffset = Math.max(0, (heroWidth - logoWidth) / 2);
+        const offset = Math.min(requestedOffset, maxSafeOffset);
         document.documentElement.style.setProperty('--logo-start-shift', `${Math.round(offset)}px`);
       }
 
@@ -341,6 +346,9 @@
 
       applyAccessibleRandomBackground();
       setSlideTarget();
+      if (document.fonts?.ready) {
+        document.fonts.ready.then(() => { setSlideTarget(); });
+      }
       enableLogoDialInteraction();
 
       const yearNode = document.getElementById('copyrightYear');
