@@ -21,7 +21,9 @@
       --logo-size: clamp(104px, 12.4vmin, 156px);
       --gap: clamp(14px, 2.2vmin, 24px);
       --font-family: 'Quicksand', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      --logo-start-shift: 0px;
+      --logo-start-shift-x: 0px;
+      --logo-start-shift-y: 0px;
+      --logo-mask-url: url('logo.svg');
     }
 
     * { box-sizing: border-box; }
@@ -60,7 +62,7 @@
 
     .logo-shell {
       flex: 0 0 auto;
-      transform: translateX(var(--logo-start-shift));
+      transform: translate(var(--logo-start-shift-x), var(--logo-start-shift-y));
       will-change: transform;
       animation: logoCenterToBrand 1500ms cubic-bezier(0.19, 1, 0.22, 1) 2200ms forwards;
     }
@@ -71,11 +73,11 @@
       background: var(--logo-color);
       opacity: 0;
       animation: logoFadeIn 2000ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
-      -webkit-mask-image: url('logo.svg');
+      -webkit-mask-image: var(--logo-mask-url);
       -webkit-mask-repeat: no-repeat;
       -webkit-mask-position: center;
       -webkit-mask-size: contain;
-      mask-image: url('logo.svg');
+      mask-image: var(--logo-mask-url);
       mask-repeat: no-repeat;
       mask-position: center;
       mask-size: contain;
@@ -131,7 +133,7 @@
 
     @keyframes logoFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes logoCenterToBrand {
-      from { transform: translateX(var(--logo-start-shift)); }
+      from { transform: translate(var(--logo-start-shift-x), var(--logo-start-shift-y)); }
       to { transform: translateX(0); }
     }
     @keyframes buttonFadeIn {
@@ -254,21 +256,41 @@
         }
       }
 
-      function setSlideTarget() {
-        const brandRow = document.getElementById('brandRow');
-        const hero = document.querySelector('.hero');
-        const logo = document.querySelector('.logo');
-        const wordmark = document.getElementById('wordmark');
-        if (!brandRow || !hero || !logo || !wordmark) return;
+      function resolvePreviewRawAssetPath(fileName) {
+        const currentUrl = window.location.href;
+        if (!currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) return null;
+        const rawSource = currentUrl.split('?')[1];
+        if (!rawSource) return null;
+        return rawSource.replace(/\/[^/]*$/, `/${fileName}`);
+      }
 
-        const wordmarkWidth = wordmark.getBoundingClientRect().width;
-        const gap = parseFloat(getComputedStyle(brandRow).columnGap || getComputedStyle(brandRow).gap || '0') || 0;
-        const requestedOffset = Math.max(0, (wordmarkWidth + gap) / 2);
-        const heroWidth = hero.getBoundingClientRect().width;
-        const logoWidth = logo.getBoundingClientRect().width;
-        const maxSafeOffset = Math.max(0, (heroWidth - logoWidth) / 2);
-        const offset = Math.min(requestedOffset, maxSafeOffset);
-        document.documentElement.style.setProperty('--logo-start-shift', `${Math.round(offset)}px`);
+      function normalizeAssetLinksForPreview() {
+        const rawLogoPath = resolvePreviewRawAssetPath('logo.svg');
+        if (rawLogoPath) {
+          document.documentElement.style.setProperty('--logo-mask-url', `url('${rawLogoPath}')`);
+        }
+
+        const rawFaviconPath = resolvePreviewRawAssetPath('favicon.svg');
+        if (rawFaviconPath) {
+          document.querySelectorAll("link[rel='icon'], link[rel='shortcut icon'], link[rel='apple-touch-icon']")
+            .forEach((node) => {
+              node.setAttribute('href', rawFaviconPath);
+            });
+        }
+      }
+
+      function setSlideTarget() {
+        const logoShell = document.querySelector('.logo-shell');
+        if (!logoShell) return;
+
+        const shellBounds = logoShell.getBoundingClientRect();
+        const logoCenterX = shellBounds.left + shellBounds.width / 2;
+        const logoCenterY = shellBounds.top + shellBounds.height / 2;
+        const viewportCenterX = window.innerWidth / 2;
+        const viewportCenterY = window.innerHeight / 2;
+
+        document.documentElement.style.setProperty('--logo-start-shift-x', `${Math.round(viewportCenterX - logoCenterX)}px`);
+        document.documentElement.style.setProperty('--logo-start-shift-y', `${Math.round(viewportCenterY - logoCenterY)}px`);
       }
 
       function resolvePageUrl(fileName) {
@@ -350,6 +372,7 @@
         logo.addEventListener('pointercancel', releasePointer);
       }
 
+      normalizeAssetLinksForPreview();
       applyAccessibleRandomBackground();
       setSlideTarget();
       if (document.fonts?.ready) {

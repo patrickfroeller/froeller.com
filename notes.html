@@ -197,6 +197,23 @@
       let autosaveTimer = null;
       let setupMode = false;
 
+      function resolvePreviewRawAssetPath(fileName) {
+        const currentUrl = window.location.href;
+        if (!currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) return null;
+        const rawSource = currentUrl.split('?')[1];
+        if (!rawSource) return null;
+        return rawSource.replace(/\/[^/]*$/, `/${fileName}`);
+      }
+
+      function normalizeFaviconForPreview() {
+        const rawFaviconPath = resolvePreviewRawAssetPath('favicon.svg');
+        if (!rawFaviconPath) return;
+        document.querySelectorAll("link[rel='icon'], link[rel='shortcut icon'], link[rel='apple-touch-icon']")
+          .forEach((node) => {
+            node.setAttribute('href', rawFaviconPath);
+          });
+      }
+
       function applyStoredTheme() {
         try {
           const raw = window.localStorage.getItem('froellerTheme');
@@ -321,6 +338,7 @@
         }
       }
 
+      normalizeFaviconForPreview();
       applyStoredTheme();
       setModeFromStorage();
       status.textContent = '';
