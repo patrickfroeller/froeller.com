@@ -56,7 +56,7 @@
 
     .brand-row {
       display: inline-flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: center;
       gap: var(--gap);
       will-change: transform;
@@ -103,7 +103,6 @@
       color: var(--logo-color);
       white-space: nowrap;
       opacity: 0;
-      transform: translateY(var(--wordmark-center-offset, 0px));
       animation: logoFadeIn 1200ms cubic-bezier(0.19, 1, 0.22, 1) 3800ms forwards;
     }
 
@@ -138,7 +137,7 @@
     @keyframes logoFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes logoCenterToBrand {
       from { transform: translate(var(--logo-start-shift-x), var(--logo-start-shift-y)); }
-      to { transform: translate(0, var(--logo-start-shift-y)); }
+      to { transform: translate(0, 0); }
     }
     @keyframes brandLiftUp {
       from { transform: translateY(0); }
@@ -335,24 +334,6 @@
         window.addEventListener('load', scheduleUpdate, { once: true });
       }
 
-      function alignWordmarkToLogoCenter() {
-        const logo = document.querySelector('.logo');
-        const wordmark = document.getElementById('wordmark');
-        if (!logo || !wordmark) return;
-
-        wordmark.style.setProperty('--wordmark-center-offset', '0px');
-
-        const logoBounds = logo.getBoundingClientRect();
-        const wordmarkBounds = wordmark.getBoundingClientRect();
-        if (logoBounds.height === 0 || wordmarkBounds.height === 0) return;
-
-        const logoCenterY = logoBounds.top + logoBounds.height / 2;
-        const wordmarkCenterY = wordmarkBounds.top + wordmarkBounds.height / 2;
-        const deltaY = logoCenterY - wordmarkCenterY;
-
-        wordmark.style.setProperty('--wordmark-center-offset', `${deltaY.toFixed(2)}px`);
-      }
-
       function resolvePageUrl(fileName) {
         const currentUrl = window.location.href;
         if (currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) {
@@ -436,11 +417,9 @@
       applyAccessibleRandomBackground();
       syncSlideTargetForInitialLayout();
       setSlideTarget();
-      alignWordmarkToLogoCenter();
       if (document.fonts?.ready) {
         document.fonts.ready.then(() => {
           setSlideTarget();
-          alignWordmarkToLogoCenter();
         });
       }
       enableLogoDialInteraction();
@@ -457,7 +436,6 @@
 
       window.addEventListener('resize', () => {
         setSlideTarget();
-        alignWordmarkToLogoCenter();
       });
     })();
   </script>
