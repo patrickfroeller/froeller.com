@@ -283,16 +283,22 @@
         const logoShell = document.querySelector('.logo-shell');
         if (!logoShell) return;
 
-        const shellBounds = logoShell.getBoundingClientRect();
-        if (shellBounds.width === 0 || shellBounds.height === 0) return;
+        const shellWidth = logoShell.offsetWidth;
+        const shellHeight = logoShell.offsetHeight;
+        if (shellWidth === 0 || shellHeight === 0) return;
 
-        const logoCenterX = shellBounds.left + shellBounds.width / 2;
-        const logoCenterY = shellBounds.top + shellBounds.height / 2;
+        const offsetParent = logoShell.offsetParent;
+        const parentBounds = offsetParent && offsetParent.getBoundingClientRect
+          ? offsetParent.getBoundingClientRect()
+          : { left: 0, top: 0 };
+
+        const logoCenterX = parentBounds.left + logoShell.offsetLeft + shellWidth / 2;
+        const logoCenterY = parentBounds.top + logoShell.offsetTop + shellHeight / 2;
         const viewportCenterX = window.innerWidth / 2;
         const viewportCenterY = window.innerHeight / 2;
 
-        document.documentElement.style.setProperty('--logo-start-shift-x', `${Math.round(viewportCenterX - logoCenterX)}px`);
-        document.documentElement.style.setProperty('--logo-start-shift-y', `${Math.round(viewportCenterY - logoCenterY)}px`);
+        document.documentElement.style.setProperty('--logo-start-shift-x', `${viewportCenterX - logoCenterX}px`);
+        document.documentElement.style.setProperty('--logo-start-shift-y', `${viewportCenterY - logoCenterY}px`);
       }
 
       function syncSlideTargetForInitialLayout() {
