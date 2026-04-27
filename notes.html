@@ -16,6 +16,7 @@
       --text: #111111;
       --muted: color-mix(in oklab, var(--text) 66%, transparent);
       --accent: #ffffff;
+      --brand-fg: var(--accent);
       --font-family: 'Quicksand', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
@@ -93,28 +94,33 @@
 
     .gate { display: grid; place-items: center; padding: clamp(18px, 4vw, 28px); }
     .notes.locked .gate { padding: 0; }
-    .gate-card { width: min(460px, 100%); display: grid; gap: 12px; }
+    .gate-card { width: min(460px, 100%); display: grid; justify-items: center; gap: 12px; }
 
-    .gate-title { margin: 0; font-size: clamp(1.2rem, 2.8vw, 1.6rem); font-weight: 700; letter-spacing: -0.03em; }
-    .gate-subtitle { margin: 0; color: var(--muted); font-size: 0.95rem; }
+    .gate-subtitle { margin: 0; color: var(--brand-fg); font-size: 0.95rem; }
 
     .gate-input {
       width: 100%;
-      border-radius: 12px;
-      border: 1px solid color-mix(in oklab, var(--text) 24%, transparent);
-      background: transparent;
-      color: var(--text);
+      min-height: 52px;
+      border-radius: 999px;
+      border: 1.5px solid color-mix(in oklab, var(--brand-fg) 30%, transparent);
+      background: color-mix(in oklab, var(--bg) 92%, transparent);
+      color: var(--brand-fg);
       font: 600 1rem/1.2 var(--font-family);
-      padding: 0.78rem 0.95rem;
+      padding: 0.78rem 1.2rem;
       outline: none;
     }
 
-    .gate-input:focus-visible {
-      border-color: color-mix(in oklab, var(--accent) 58%, var(--text));
-      box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 24%, transparent);
+    .gate-input::placeholder {
+      color: color-mix(in oklab, var(--brand-fg) 58%, transparent);
+      opacity: 1;
     }
 
-    .gate-error { min-height: 1.2em; margin: 0; color: #b91c1c; font-size: 0.9rem; }
+    .gate-input:focus-visible {
+      border-color: var(--brand-fg);
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand-fg) 24%, transparent);
+    }
+
+    .gate-error { min-height: 1.2em; margin: 0; color: #b91c1c; font-size: 0.9rem; justify-self: start; }
     .confirm-wrap { display: none; }
     .confirm-wrap.visible { display: block; }
 
@@ -142,6 +148,17 @@
     }
 
     textarea::placeholder { color: var(--muted); }
+
+    .gate-submit {
+      width: 132px;
+      min-height: 52px;
+      border-color: transparent;
+      background: var(--brand-fg);
+      color: var(--bg);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+      font: 700 clamp(0.96rem, 1.7vmin, 1.1rem) / 1 var(--font-family);
+      padding: 0.78rem 2rem;
+    }
   </style>
 </head>
 <body>
@@ -157,13 +174,12 @@
 
     <section class="gate" id="gate">
       <form class="gate-card" id="gateForm">
-        <h2 class="gate-title" id="gateTitle">Password:</h2>
         <p class="gate-subtitle" id="gateSubtitle"></p>
         <input class="gate-input" id="passwordInput" type="password" placeholder="Password" autocomplete="current-password" required>
         <div class="confirm-wrap" id="confirmWrap">
           <input class="gate-input" id="confirmInput" type="password" placeholder="Confirm password" autocomplete="new-password">
         </div>
-        <button class="button" type="submit" id="unlockButton">Enter</button>
+        <button class="button gate-submit" type="submit" id="unlockButton">Enter</button>
         <p class="gate-error" id="gateError" aria-live="polite"></p>
       </form>
     </section>
@@ -183,7 +199,6 @@
       const TEXT_DECODER = new TextDecoder();
 
       const gateForm = document.getElementById('gateForm');
-      const gateTitle = document.getElementById('gateTitle');
       const gateSubtitle = document.getElementById('gateSubtitle');
       const confirmWrap = document.getElementById('confirmWrap');
       const confirmInput = document.getElementById('confirmInput');
@@ -197,7 +212,7 @@
       const saveButton = document.getElementById('saveButton');
       const status = document.getElementById('status');
 
-      if (!gateForm || !gateTitle || !gateSubtitle || !confirmWrap || !confirmInput || !unlockButton || !passwordInput || !gateError || !gate || !editor || !backLink || !notesText || !saveButton || !status) {
+      if (!gateForm || !gateSubtitle || !confirmWrap || !confirmInput || !unlockButton || !passwordInput || !gateError || !gate || !editor || !backLink || !notesText || !saveButton || !status) {
         return;
       }
 
@@ -226,7 +241,10 @@
             document.documentElement.style.setProperty('--text', parsed.pageText);
             document.documentElement.style.setProperty('--muted', parsed.pageText === '#000000' ? '#334155' : '#e5e7eb');
           }
-          if (parsed.logoColor) document.documentElement.style.setProperty('--accent', parsed.logoColor);
+          if (parsed.logoColor) {
+            document.documentElement.style.setProperty('--accent', parsed.logoColor);
+            document.documentElement.style.setProperty('--brand-fg', parsed.logoColor);
+          }
         } catch (error) {
           console.debug('Theme load unavailable', error);
         }
@@ -328,7 +346,6 @@
         const hasAuth = !!readJson(AUTH_KEY);
         setupMode = !hasAuth;
         if (setupMode) {
-          gateTitle.textContent = 'Password:';
           gateSubtitle.textContent = '';
           unlockButton.textContent = 'Enter';
           confirmWrap.classList.add('visible');

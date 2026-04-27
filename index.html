@@ -56,7 +56,9 @@
       gap: var(--gap);
       transform: translateX(0);
       will-change: transform;
-      animation: slideToLeft 2200ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      animation:
+        slideToLeft 2000ms cubic-bezier(0.19, 1, 0.22, 1) 2000ms forwards,
+        brandLift 2000ms cubic-bezier(0.19, 1, 0.22, 1) 4000ms forwards;
     }
 
     .logo {
@@ -64,7 +66,7 @@
       aspect-ratio: 1 / 1;
       background: var(--logo-color);
       opacity: 0;
-      animation: logoFadeIn 2200ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      animation: logoFadeIn 2000ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
       -webkit-mask-image: url('logo.svg');
       -webkit-mask-repeat: no-repeat;
       -webkit-mask-position: center;
@@ -93,7 +95,7 @@
       color: var(--logo-color);
       white-space: nowrap;
       opacity: 0;
-      animation: logoFadeIn 2200ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      animation: logoFadeIn 2000ms cubic-bezier(0.19, 1, 0.22, 1) 2000ms forwards;
     }
 
     .login-button {
@@ -106,10 +108,9 @@
       color: var(--page-bg);
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
       opacity: 0;
-      transform: translateY(16px) scale(0.97);
       pointer-events: none;
       cursor: pointer;
-      animation: buttonEnter 700ms cubic-bezier(0.16, 1, 0.3, 1) 4550ms forwards;
+      animation: buttonFadeIn 2000ms cubic-bezier(0.19, 1, 0.22, 1) 4000ms forwards;
     }
 
     .site-footer {
@@ -127,10 +128,11 @@
 
     @keyframes logoFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideToLeft { from { transform: translateX(0); } to { transform: translateX(var(--move-left)); } }
+    @keyframes brandLift { from { transform: translateX(var(--move-left)) translateY(0); } to { transform: translateX(var(--move-left)) translateY(-44px); } }
 
-    @keyframes buttonEnter {
-      from { opacity: 0; transform: translateY(16px) scale(0.97); }
-      to { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    @keyframes buttonFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; pointer-events: auto; }
     }
     @media (max-width: 720px) {
       .wordmark { font-size: clamp(1.92rem, 11.8vw, 3.2rem); }
