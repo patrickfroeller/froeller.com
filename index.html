@@ -284,6 +284,8 @@
         if (!logoShell) return;
 
         const shellBounds = logoShell.getBoundingClientRect();
+        if (shellBounds.width === 0 || shellBounds.height === 0) return;
+
         const logoCenterX = shellBounds.left + shellBounds.width / 2;
         const logoCenterY = shellBounds.top + shellBounds.height / 2;
         const viewportCenterX = window.innerWidth / 2;
@@ -291,6 +293,32 @@
 
         document.documentElement.style.setProperty('--logo-start-shift-x', `${Math.round(viewportCenterX - logoCenterX)}px`);
         document.documentElement.style.setProperty('--logo-start-shift-y', `${Math.round(viewportCenterY - logoCenterY)}px`);
+      }
+
+      function syncSlideTargetForInitialLayout() {
+        const logoShell = document.querySelector('.logo-shell');
+        const wordmark = document.getElementById('wordmark');
+        if (!logoShell || !wordmark) return;
+
+        let frameId = null;
+        const scheduleUpdate = () => {
+          if (frameId !== null) window.cancelAnimationFrame(frameId);
+          frameId = window.requestAnimationFrame(() => {
+            frameId = null;
+            setSlideTarget();
+          });
+        };
+
+        scheduleUpdate();
+
+        if (typeof ResizeObserver !== 'undefined') {
+          const resizeObserver = new ResizeObserver(() => { scheduleUpdate(); });
+          resizeObserver.observe(logoShell);
+          resizeObserver.observe(wordmark);
+          window.setTimeout(() => { resizeObserver.disconnect(); }, 2600);
+        }
+
+        window.addEventListener('load', scheduleUpdate, { once: true });
       }
 
       function resolvePageUrl(fileName) {
@@ -374,6 +402,7 @@
 
       normalizeAssetLinksForPreview();
       applyAccessibleRandomBackground();
+      syncSlideTargetForInitialLayout();
       setSlideTarget();
       if (document.fonts?.ready) {
         document.fonts.ready.then(() => { setSlideTarget(); });
