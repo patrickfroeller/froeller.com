@@ -49,6 +49,17 @@
       overflow: hidden;
     }
 
+    .notes.locked {
+      width: min(460px, 100%);
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      display: block;
+    }
+
+    .notes.locked .toolbar { display: none; }
+
     .toolbar {
       display: flex;
       align-items: center;
@@ -81,6 +92,7 @@
     .editor { height: 100%; width: 100%; }
 
     .gate { display: grid; place-items: center; padding: clamp(18px, 4vw, 28px); }
+    .notes.locked .gate { padding: 0; }
     .gate-card { width: min(460px, 100%); display: grid; gap: 12px; }
 
     .gate-title { margin: 0; font-size: clamp(1.2rem, 2.8vw, 1.6rem); font-weight: 700; letter-spacing: -0.03em; }
@@ -133,7 +145,7 @@
   </style>
 </head>
 <body>
-  <main class="notes" aria-label="Notes">
+  <main class="notes locked" aria-label="Notes">
     <header class="toolbar">
       <h1>froeller.com Notes</h1>
       <div class="toolbar-actions">
@@ -145,13 +157,13 @@
 
     <section class="gate" id="gate">
       <form class="gate-card" id="gateForm">
-        <h2 class="gate-title" id="gateTitle">Enter password</h2>
-        <p class="gate-subtitle" id="gateSubtitle">Use your password to decrypt and open your notes.</p>
+        <h2 class="gate-title" id="gateTitle">Password:</h2>
+        <p class="gate-subtitle" id="gateSubtitle"></p>
         <input class="gate-input" id="passwordInput" type="password" placeholder="Password" autocomplete="current-password" required>
         <div class="confirm-wrap" id="confirmWrap">
           <input class="gate-input" id="confirmInput" type="password" placeholder="Confirm password" autocomplete="new-password">
         </div>
-        <button class="button" type="submit" id="unlockButton">Unlock Notes</button>
+        <button class="button" type="submit" id="unlockButton">Enter</button>
         <p class="gate-error" id="gateError" aria-live="polite"></p>
       </form>
     </section>
@@ -316,9 +328,9 @@
         const hasAuth = !!readJson(AUTH_KEY);
         setupMode = !hasAuth;
         if (setupMode) {
-          gateTitle.textContent = 'Create password';
-          gateSubtitle.textContent = 'First visit: create a password. The password itself is never stored.';
-          unlockButton.textContent = 'Create & Unlock';
+          gateTitle.textContent = 'Password:';
+          gateSubtitle.textContent = '';
+          unlockButton.textContent = 'Enter';
           confirmWrap.classList.add('visible');
           passwordInput.autocomplete = 'new-password';
           confirmInput.required = true;
@@ -358,6 +370,7 @@
           notesText.value = payload ? await decryptPayload(payload, password) : '';
 
           gate.style.display = 'none';
+          document.querySelector('.notes')?.classList.remove('locked');
           editor.classList.add('is-unlocked');
           saveButton.disabled = false;
           status.textContent = 'Unlocked';
