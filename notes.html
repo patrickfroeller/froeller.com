@@ -39,56 +39,32 @@
     }
 
     .notes {
-      width: min(960px, 100%);
+      width: min(900px, 100%);
       height: min(700px, 100%);
-      background: transparent;
-      border: 1px solid color-mix(in oklab, var(--text) 20%, transparent);
-      border-radius: 22px;
-      box-shadow: 0 20px 80px color-mix(in oklab, var(--text) 20%, transparent);
       display: grid;
       grid-template-rows: auto 1fr;
-      overflow: hidden;
+      gap: 12px;
     }
 
     .notes.locked {
       width: min(460px, 100%);
       height: auto;
-      border: 0;
-      border-radius: 0;
-      box-shadow: none;
       display: block;
-      overflow: visible;
     }
 
-    .notes.locked .toolbar { display: none; }
+    .notes.locked .notes-header { display: none; }
 
-    .toolbar {
+    .notes-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px 18px;
-      border-bottom: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
-      background: transparent;
+      padding: 0 4px;
     }
 
-    .toolbar h1 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
+    .notes-header h1 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; color: var(--brand-fg); }
 
-    .toolbar-actions { display: flex; align-items: center; gap: 10px; }
-
-    .button {
-      border: 1px solid color-mix(in oklab, var(--text) 24%, transparent);
-      border-radius: 999px;
-      background: color-mix(in oklab, var(--accent) 14%, transparent);
-      color: var(--text);
-      font: 700 0.9rem/1 var(--font-family);
-      letter-spacing: -0.01em;
-      padding: 0.58rem 1rem;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .status { margin: 0; font-size: 0.82rem; color: var(--muted); min-width: 9ch; text-align: right; }
+    .status { margin: 0; font-size: 0.82rem; color: color-mix(in oklab, var(--brand-fg) 70%, transparent); min-width: 12ch; text-align: right; }
 
     .gate,
     .editor { height: 100%; width: 100%; }
@@ -125,15 +101,10 @@
     .confirm-wrap { display: none; }
     .confirm-wrap.visible { display: block; }
 
-    .editor { display: none; grid-template-rows: 1fr; padding: 14px; }
+    .editor { display: none; grid-template-rows: 1fr; min-height: 0; }
     .editor.is-unlocked { display: grid; }
 
-    .editor-shell {
-      border: 1px solid color-mix(in oklab, var(--text) 26%, transparent);
-      border-radius: 14px;
-      background: transparent;
-      overflow: hidden;
-    }
+    .editor-shell { background: transparent; overflow: hidden; min-height: 0; }
 
     textarea {
       width: 100%;
@@ -142,35 +113,33 @@
       border: 0;
       outline: 0;
       background: transparent;
-      color: var(--text);
+      color: var(--brand-fg);
       font: 600 1.02rem/1.6 var(--font-family);
-      padding: clamp(16px, 2.8vw, 28px);
+      padding: clamp(8px, 1.8vw, 16px) 0 0;
       caret-color: var(--accent);
     }
 
-    textarea::placeholder { color: var(--muted); }
+    textarea::placeholder { color: color-mix(in oklab, var(--brand-fg) 58%, transparent); }
 
     .gate-submit {
-      width: 132px;
-      min-height: 52px;
-      border-color: transparent;
+      border: 1.5px solid transparent;
+      border-radius: 999px;
+      min-height: 0;
       background: var(--brand-fg);
       color: var(--bg);
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
       font: 700 clamp(0.96rem, 1.7vmin, 1.1rem) / 1 var(--font-family);
       padding: 0.78rem 2rem;
+      margin-top: 8px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <main class="notes locked" aria-label="Notes">
-    <header class="toolbar">
-      <h1>froeller.com Notes</h1>
-      <div class="toolbar-actions">
-        <button class="button" id="saveButton" type="button" disabled>Save</button>
-        <a class="button" href="index.html" id="backLink">Back</a>
-        <p class="status" id="status" aria-live="polite">Locked</p>
-      </div>
+    <header class="notes-header">
+      <h1>Notes:</h1>
+      <p class="status" id="status" aria-live="polite"></p>
     </header>
 
     <section class="gate" id="gate">
@@ -180,7 +149,7 @@
         <div class="confirm-wrap" id="confirmWrap">
           <input class="gate-input" id="confirmInput" type="password" placeholder="Confirm password" autocomplete="new-password">
         </div>
-        <button class="button gate-submit" type="submit" id="unlockButton">Enter</button>
+        <button class="gate-submit" type="submit" id="unlockButton">Enter</button>
         <p class="gate-error" id="gateError" aria-live="polite"></p>
       </form>
     </section>
@@ -204,32 +173,20 @@
       const confirmWrap = document.getElementById('confirmWrap');
       const confirmInput = document.getElementById('confirmInput');
       const unlockButton = document.getElementById('unlockButton');
-      const backLink = document.getElementById('backLink');
       const passwordInput = document.getElementById('passwordInput');
       const gateError = document.getElementById('gateError');
       const gate = document.getElementById('gate');
       const editor = document.getElementById('editor');
       const notesText = document.getElementById('notesText');
-      const saveButton = document.getElementById('saveButton');
       const status = document.getElementById('status');
 
-      if (!gateForm || !gateSubtitle || !confirmWrap || !confirmInput || !unlockButton || !passwordInput || !gateError || !gate || !editor || !backLink || !notesText || !saveButton || !status) {
+      if (!gateForm || !gateSubtitle || !confirmWrap || !confirmInput || !unlockButton || !passwordInput || !gateError || !gate || !editor || !notesText || !status) {
         return;
       }
 
       let unlockedPassword = '';
       let autosaveTimer = null;
       let setupMode = false;
-
-      function resolvePageUrl(fileName) {
-        const currentUrl = window.location.href;
-        if (currentUrl.includes('htmlpreview.github.io/?https://raw.githubusercontent.com/')) {
-          const [previewBase, rawSource] = currentUrl.split('?');
-          const nextRaw = rawSource.replace(/\/[^/]*$/, `/${fileName}`);
-          return `${previewBase}?${nextRaw}`;
-        }
-        return fileName;
-      }
 
       function applyStoredTheme() {
         try {
@@ -322,7 +279,7 @@
 
       async function saveNow() {
         if (!unlockedPassword) {
-          status.textContent = 'Locked';
+          status.textContent = '';
           return;
         }
         status.textContent = 'Saving...';
@@ -338,7 +295,7 @@
 
       function queueAutosave() {
         if (!unlockedPassword) return;
-        status.textContent = 'Unsaved changes';
+        status.textContent = 'Saving...';
         if (autosaveTimer) window.clearTimeout(autosaveTimer);
         autosaveTimer = window.setTimeout(() => { saveNow(); }, 700);
       }
@@ -357,7 +314,7 @@
 
       applyStoredTheme();
       setModeFromStorage();
-      backLink.href = resolvePageUrl('index.html');
+      status.textContent = '';
 
       gateForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -390,15 +347,13 @@
           gate.style.display = 'none';
           document.querySelector('.notes')?.classList.remove('locked');
           editor.classList.add('is-unlocked');
-          saveButton.disabled = false;
-          status.textContent = 'Unlocked';
+          status.textContent = 'Saved';
           notesText.focus();
         } catch (error) {
           gateError.textContent = 'Could not unlock encrypted notes.';
         }
       });
 
-      saveButton.addEventListener('click', () => { saveNow(); });
       notesText.addEventListener('input', () => { queueAutosave(); });
     })();
   </script>
