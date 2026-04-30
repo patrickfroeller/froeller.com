@@ -73,7 +73,7 @@
 
     .gate { display: grid; place-items: center; padding: clamp(18px, 4vw, 28px); }
     .notes.locked .gate { padding: 0; }
-    .gate-card { width: min(460px, 100%); display: grid; justify-items: center; gap: 18px; }
+    .gate-card { width: min(460px, 100%); display: grid; justify-items: center; gap: 12px; }
 
     .gate-subtitle { margin: 0; color: var(--brand-fg); font-size: 0.95rem; }
 
@@ -81,11 +81,11 @@
       width: 100%;
       min-height: 52px;
       border-radius: 999px;
-      border: 1.5px solid color-mix(in oklab, var(--brand-fg) 44%, transparent);
+      border: 2px solid color-mix(in oklab, var(--brand-fg) 55%, transparent);
       background: color-mix(in oklab, var(--bg) 92%, transparent);
       color: var(--brand-fg);
       font: 600 1rem/1.2 var(--font-family);
-      padding: 0.78rem 1.2rem;
+      padding: 0.7rem 1.1rem;
       outline: none;
     }
 
@@ -123,7 +123,7 @@
       background: transparent;
       overflow: hidden;
       min-height: 0;
-      border: 1.5px solid color-mix(in oklab, var(--brand-fg) 50%, transparent);
+      border: 2px solid color-mix(in oklab, var(--brand-fg) 55%, transparent);
       border-radius: 18px;
       padding: clamp(8px, 1.6vw, 14px);
     }
@@ -152,7 +152,7 @@
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
       font: 700 clamp(0.96rem, 1.7vmin, 1.1rem) / 1 var(--font-family);
       padding: 0.78rem 2rem;
-      margin-top: 8px;
+      margin-top: 2px;
       cursor: pointer;
     }
   </style>
