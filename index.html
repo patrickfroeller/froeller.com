@@ -324,37 +324,10 @@
         }
       }
 
-      function getHorizontalSlideDistance(logoShell) {
-        const shellBounds = logoShell.getBoundingClientRect();
-        if (shellBounds.width === 0) return null;
-
-        const startOffset = window.innerWidth - shellBounds.left + (shellBounds.width * 0.25);
-        return Math.max(0, startOffset);
-      }
-
-      function animateLogoIntoBrand() {
+      function keepLogoCenteredInBrand() {
         const logoShell = document.querySelector('.logo-shell');
         if (!logoShell) return;
-
-        const slideDistance = getHorizontalSlideDistance(logoShell);
-        if (slideDistance == null) return;
-
-        logoShell.style.transform = `translateX(${slideDistance}px)`;
-
-        window.setTimeout(() => {
-          logoShell.animate(
-            [
-              { transform: `translateX(${slideDistance}px)` },
-              { transform: 'translateX(0)' }
-            ],
-            {
-              duration: 1700,
-              easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
-              fill: 'forwards'
-            }
-          );
-          logoShell.style.transform = 'translate(0, 0)';
-        }, 1200);
+        logoShell.style.transform = 'translate(0, 0)';
       }
 
       function resolvePageUrl(fileName) {
@@ -438,9 +411,9 @@
 
       normalizeAssetLinksForPreview();
       applyAccessibleRandomBackground();
-      const startLogoAnimation = () => { window.requestAnimationFrame(() => { animateLogoIntoBrand(); }); };
-      if (document.fonts?.ready) document.fonts.ready.then(startLogoAnimation);
-      else startLogoAnimation();
+      const keepLogoCentered = () => { window.requestAnimationFrame(() => { keepLogoCenteredInBrand(); }); };
+      if (document.fonts?.ready) document.fonts.ready.then(keepLogoCentered);
+      else keepLogoCentered();
       enableLogoDialInteraction();
 
       const yearNode = document.getElementById('copyrightYear');
