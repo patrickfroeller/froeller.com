@@ -324,32 +324,28 @@
         }
       }
 
-      function getSlideDelta(logoShell) {
+      function getHorizontalSlideDistance(logoShell) {
         const shellBounds = logoShell.getBoundingClientRect();
-        if (shellBounds.width === 0 || shellBounds.height === 0) return null;
+        if (shellBounds.width === 0) return null;
 
-        const logoCenterX = shellBounds.left + (shellBounds.width / 2);
-        const logoCenterY = shellBounds.top + (shellBounds.height / 2);
-        const viewportCenterX = window.innerWidth / 2;
-        const viewportCenterY = window.innerHeight / 2;
-
-        return { x: viewportCenterX - logoCenterX, y: viewportCenterY - logoCenterY };
+        const startOffset = window.innerWidth - shellBounds.left + (shellBounds.width * 0.25);
+        return Math.max(0, startOffset);
       }
 
       function animateLogoIntoBrand() {
         const logoShell = document.querySelector('.logo-shell');
         if (!logoShell) return;
 
-        const delta = getSlideDelta(logoShell);
-        if (!delta) return;
+        const slideDistance = getHorizontalSlideDistance(logoShell);
+        if (slideDistance == null) return;
 
-        logoShell.style.transform = `translate(${delta.x}px, ${delta.y}px)`;
+        logoShell.style.transform = `translateX(${slideDistance}px)`;
 
         window.setTimeout(() => {
           logoShell.animate(
             [
-              { transform: `translate(${delta.x}px, ${delta.y}px)` },
-              { transform: 'translate(0, 0)' }
+              { transform: `translateX(${slideDistance}px)` },
+              { transform: 'translateX(0)' }
             ],
             {
               duration: 1700,
