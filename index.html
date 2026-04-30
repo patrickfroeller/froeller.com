@@ -21,8 +21,6 @@
       --logo-size: clamp(94px, 11.2vmin, 140px);
       --gap: clamp(6px, 1.2vmin, 10px);
       --font-family: 'Quicksand', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      --logo-start-shift-x: 0px;
-      --logo-start-shift-y: 0px;
       --brand-lift-y: -32px;
       --logo-mask-url: url('logo.svg');
       --reveal-blur: 14px;
@@ -70,9 +68,8 @@
     .logo-shell {
       flex: 0 0 auto;
       position: relative;
-      transform: translate(var(--logo-start-shift-x), var(--logo-start-shift-y));
+      transform: translate(0, 0);
       will-change: transform;
-      animation: logoCenterToBrand 1700ms cubic-bezier(0.2, 0.8, 0.2, 1) 1200ms forwards paused;
     }
 
     .logo {
@@ -166,10 +163,6 @@
     @keyframes contentReveal {
       from { opacity: 0; filter: blur(var(--reveal-blur)); -webkit-filter: blur(var(--reveal-blur)); transform: translateY(8px); }
       to { opacity: 1; filter: blur(0); -webkit-filter: blur(0); transform: translateY(0); pointer-events: auto; }
-    }
-    @keyframes logoCenterToBrand {
-      from { transform: translate(var(--logo-start-shift-x), var(--logo-start-shift-y)); }
-      to { transform: translate(0, 0); }
     }
     @keyframes brandLiftUp {
       from { transform: translateY(0); }
@@ -331,52 +324,41 @@
         }
       }
 
-      function setSlideTarget() {
-        const logoShell = document.querySelector('.logo-shell');
-        if (!logoShell) return;
-
+      function getSlideDelta(logoShell) {
         const shellBounds = logoShell.getBoundingClientRect();
-        if (shellBounds.width === 0 || shellBounds.height === 0) return;
+        if (shellBounds.width === 0 || shellBounds.height === 0) return null;
 
         const logoCenterX = shellBounds.left + (shellBounds.width / 2);
         const logoCenterY = shellBounds.top + (shellBounds.height / 2);
         const viewportCenterX = window.innerWidth / 2;
         const viewportCenterY = window.innerHeight / 2;
 
-        document.documentElement.style.setProperty('--logo-start-shift-x', `${viewportCenterX - logoCenterX}px`);
-        document.documentElement.style.setProperty('--logo-start-shift-y', `${viewportCenterY - logoCenterY}px`);
+        return { x: viewportCenterX - logoCenterX, y: viewportCenterY - logoCenterY };
       }
 
-      function setBrandAnimationReady() {
+      function animateLogoIntoBrand() {
         const logoShell = document.querySelector('.logo-shell');
         if (!logoShell) return;
-        logoShell.style.animationPlayState = 'running';
-      }
 
-      function syncSlideTargetForInitialLayout() {
-        const logoShell = document.querySelector('.logo-shell');
-        const wordmark = document.getElementById('wordmark');
-        if (!logoShell || !wordmark) return;
+        const delta = getSlideDelta(logoShell);
+        if (!delta) return;
 
-        let frameId = null;
-        const scheduleUpdate = () => {
-          if (frameId !== null) window.cancelAnimationFrame(frameId);
-          frameId = window.requestAnimationFrame(() => {
-            frameId = null;
-            setSlideTarget();
-          });
-        };
+        logoShell.style.transform = `translate(${delta.x}px, ${delta.y}px)`;
 
-        scheduleUpdate();
-
-        if (typeof ResizeObserver !== 'undefined') {
-          const resizeObserver = new ResizeObserver(() => { scheduleUpdate(); });
-          resizeObserver.observe(logoShell);
-          resizeObserver.observe(wordmark);
-          window.setTimeout(() => { resizeObserver.disconnect(); }, 2600);
-        }
-
-        window.addEventListener('load', scheduleUpdate, { once: true });
+        window.setTimeout(() => {
+          logoShell.animate(
+            [
+              { transform: `translate(${delta.x}px, ${delta.y}px)` },
+              { transform: 'translate(0, 0)' }
+            ],
+            {
+              duration: 1700,
+              easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+              fill: 'forwards'
+            }
+          );
+          logoShell.style.transform = 'translate(0, 0)';
+        }, 1200);
       }
 
       function resolvePageUrl(fileName) {
@@ -460,14 +442,9 @@
 
       normalizeAssetLinksForPreview();
       applyAccessibleRandomBackground();
-      syncSlideTargetForInitialLayout();
-      setSlideTarget();
-      setBrandAnimationReady();
-      if (document.fonts?.ready) {
-        document.fonts.ready.then(() => {
-          setSlideTarget();
-        });
-      }
+      const startLogoAnimation = () => { window.requestAnimationFrame(() => { animateLogoIntoBrand(); }); };
+      if (document.fonts?.ready) document.fonts.ready.then(startLogoAnimation);
+      else startLogoAnimation();
       enableLogoDialInteraction();
 
       const yearNode = document.getElementById('copyrightYear');
@@ -480,9 +457,6 @@
         });
       }
 
-      window.addEventListener('resize', () => {
-        setSlideTarget();
-      });
     })();
   </script>
 </body>
