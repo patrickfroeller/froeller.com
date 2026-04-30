@@ -328,10 +328,6 @@
         const shellBounds = logoShell.getBoundingClientRect();
         if (shellBounds.width === 0) return null;
 
-        const isMobileViewport = window.matchMedia('(max-width: 720px)').matches;
-        const isTouchPrimary = window.matchMedia('(pointer: coarse)').matches;
-        if (isMobileViewport || isTouchPrimary) return 0;
-
         const startOffset = window.innerWidth - shellBounds.left + (shellBounds.width * 0.25);
         return Math.max(0, startOffset);
       }
