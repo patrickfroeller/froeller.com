@@ -26,6 +26,7 @@
       --brand-lift-y: -32px;
       --logo-mask-url: url('logo.svg');
       --reveal-blur: 14px;
+      --logo-reveal-blur: 28px;
     }
 
     * { box-sizing: border-box; }
@@ -76,9 +77,9 @@
       aspect-ratio: 1 / 1;
       background: var(--logo-color);
       opacity: 0;
-      filter: blur(var(--reveal-blur));
-      -webkit-filter: blur(var(--reveal-blur));
-      animation: logoReveal 2200ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      filter: blur(var(--logo-reveal-blur));
+      -webkit-filter: blur(var(--logo-reveal-blur));
+      animation: logoReveal 3200ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
       -webkit-mask-image: var(--logo-mask-url);
       -webkit-mask-repeat: no-repeat;
       -webkit-mask-position: center;
@@ -105,10 +106,23 @@
       line-height: 1;
       color: var(--logo-color);
       white-space: nowrap;
+      opacity: 1;
+      filter: none;
+      -webkit-filter: none;
+      display: inline-flex;
+      align-items: baseline;
+    }
+    .wordmark .letter,
+    .wordmark .suffix {
+      display: inline-block;
       opacity: 0;
       filter: blur(var(--reveal-blur));
       -webkit-filter: blur(var(--reveal-blur));
-      animation: contentReveal 1400ms cubic-bezier(0.2, 0.8, 0.2, 1) 2100ms forwards;
+      transform: translateY(8px);
+      animation: contentReveal 560ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    .wordmark .suffix {
+      animation-delay: 3000ms;
     }
 
     .login-button {
@@ -142,7 +156,7 @@
     }
 
     @keyframes logoReveal {
-      from { opacity: 0; filter: blur(var(--reveal-blur)); -webkit-filter: blur(var(--reveal-blur)); }
+      from { opacity: 0; filter: blur(var(--logo-reveal-blur)); -webkit-filter: blur(var(--logo-reveal-blur)); }
       to { opacity: 1; filter: blur(0); -webkit-filter: blur(0); }
     }
     @keyframes contentReveal {
@@ -174,7 +188,17 @@
       <div class="logo-shell">
         <div class="logo" role="img" aria-label="froeller.com Logo"></div>
       </div>
-      <h1 class="wordmark" id="wordmark" aria-label="froeller.com">froeller.com</h1>
+      <h1 class="wordmark" id="wordmark" aria-label="froeller.com">
+        <span class="letter" style="animation-delay: 2050ms;">f</span>
+        <span class="letter" style="animation-delay: 2120ms;">r</span>
+        <span class="letter" style="animation-delay: 2190ms;">o</span>
+        <span class="letter" style="animation-delay: 2260ms;">e</span>
+        <span class="letter" style="animation-delay: 2330ms;">l</span>
+        <span class="letter" style="animation-delay: 2400ms;">l</span>
+        <span class="letter" style="animation-delay: 2470ms;">e</span>
+        <span class="letter" style="animation-delay: 2540ms;">r</span>
+        <span class="suffix">.com</span>
+      </h1>
     </div>
     <button class="login-button" id="loginButton" type="button">Login</button>
   </main>
